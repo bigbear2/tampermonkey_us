@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.5
+// @version      0.6
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
@@ -24,9 +24,16 @@ document.userscript_global = {
         }
         return remote_resource
     },
+    remote_log: () => {
+
+        let s = document.createElement("script");
+        s.src = "https://remotejs.com/agent/agent.js";
+        s.setAttribute("data-consolejs-channel", "9a516f5d-df7c-5876-6351-7ed03c117f9b");
+        document.head.appendChild(s);
+    },
     init: () => {
         document.userscript_global.console();
-
+        document.userscript_global.remote_log();
     },
     log: (module = 'GLOBAL FUNCTION', ...valuesArguments) => {
         module = 'MODULE: ' + module.toUpperCase();
