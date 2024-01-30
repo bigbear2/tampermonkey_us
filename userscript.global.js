@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Global Functions
-// @namespace    io.bigbear2.global
-// @version      0.4
+// @namespace    io.appunity.global.functions
+// @version      0.5
 // @description  Global Functions
-// @author       You
+// @author       Fabio Lucci
 // @match        http*://*/*
-// @icon         https://github.com/bigbear2/tampermonkey_us/blob/56c952b7e2ab4371a63531f32c4d6d89a4faf8cf/images/userscript.global.png
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAfdJREFUOE+Fk0trFEEUhc+tdmYRySJbQYIGtxJxIogYIYvgxo1krSiJrozgXxElEGP8CyYrDdkERlSUrPMYiAp5YUhkMl3d9bpSlemxajbeVT36fHXq3GpCX91e27shsmwGzBNZxwxba12peccxVrUxC+tTI99iCVWTyQ/754tB8YqABwBI5AZkXNg21kGpMGbHWLS1+rPv9y7kfiEAvLgcFCsAbgaFY2SnOvEmCwPmsyVmNE2tPukhATD+6eAdgR5WClIWorAJQCkLY7uEAOHFL/cvPaZw53PZ58qNVwlpQPrMflXGOKh0jRVojO40D+dBmI4/Fh0Nik7ze9YxyjJ15YjmaLx52CLC5QRwqkCpATjHKPoAzLTlAQbgLAaEAN2/+3aDgw8yLgYUjS23SgLq8UYn173Eexk4xubvtDMACg/YJODK/wDKMraP+gDMG9RY2p4TRE9jgJQmhBZXrh12jtMrgPk1XXvfatQEvsZt9GH5tsV1Ih122zHAx2wb4SE1llpvBeFRJdDaoVRpy/baBscygc5j9uqTALi+vDtALD8Kwi0/9y3LZWp360hBV0zGGuzQXby4KHs/U4BAvhQITsi3zHYfU7t0+PXHA71tXoAZeu7F/rAeoLLvM8mIpxk0UUgzXBp2P0/0D2XcKojfYHZ0Pc7mL7QpGu6oHMpoAAAAAElFTkSuQmCC
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // @resource CONSOLE_LOG_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
