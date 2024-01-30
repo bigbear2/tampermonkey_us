@@ -5,7 +5,7 @@
 // @description  Global Functions
 // @author       You
 // @match        http*://*/*
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @icon         https://github.com/bigbear2/tampermonkey_us/blob/56c952b7e2ab4371a63531f32c4d6d89a4faf8cf/images/userscript.global.png
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // @resource CONSOLE_LOG_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
