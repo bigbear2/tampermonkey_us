@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.6
+// @version      0.8
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
@@ -26,14 +26,16 @@ document.userscript_global = {
     },
     remoteLog: () => {
 
-        let s = document.createElement("script");
-        s.src = "https://remotejs.com/agent/agent.js";
-        s.setAttribute("data-consolejs-channel", "9a516f5d-df7c-5876-6351-7ed03c117f9b");
-        document.head.appendChild(s);
+        /*let s = document.createElement("script");
+        s.src = "https://jsconsole.com/remote.js?FABIOMCD-74A0-46D3-AE36-757BAB262BEA";
+        //:listen FABIOMCD-74A0-46D3-AE36-757BAB262BEA
+        //s.src = "https://remotejs.com/agent/agent.js";
+        //s.setAttribute("data-consolejs-channel", "9a516f5d-df7c-5876-6351-7ed03c117f9b");
+        document.head.appendChild(s);*/
     },
     init: () => {
         document.userscript_global.console();
-        document.userscript_global.remoteLog();
+        //document.userscript_global.remoteLog();
     },
     log: (module = 'GLOBAL FUNCTION', ...valuesArguments) => {
         module = 'MODULE: ' + module.toUpperCase();
