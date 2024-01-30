@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.bigbear2.global
-// @version      0.3
+// @version      0.4
 // @description  Global Functions
 // @author       You
 // @match        http*://*/*
@@ -28,11 +28,14 @@ document.userscript_global = {
         document.userscript_global.console();
 
     },
-    log: (value, module = 'GLOBAL FUNCTION') => {
-        log.settings({
-            lineNumber: true, group: {label: 'MODULE: ' + module.toUpperCase(), collapsed: true}
-        });
-        log(value);
+    log: (module = 'GLOBAL FUNCTION', ...valuesArguments) => {
+        module = 'MODULE: ' + module.toUpperCase();
+        try {
+            log.settings({lineNumber: true, group: {label: module, collapsed: false}});
+            log(valuesArguments);
+        } catch (e) {
+            console.log(module, valuesArguments)
+        }
     },
     isMobile: () => {
         let result = false;
@@ -98,7 +101,7 @@ document.userscript_global = {
     logElementEvents: (elm, events = []) => {
         elm.forEach((value) => {
             window.addEventListener(value, function (evt) {
-                console.log(evt.type, evt.currentTarget);
+                document.userscript_global.log("logElementEvents", evt.type, evt.currentTarget);
             }, false);
         })
     }
@@ -110,7 +113,7 @@ document.userscript_global = {
 
     window.addEventListener('load', function () {
         document.userscript_global.bootstrap_version = (typeof bootstrap === 'undefined' ? $().tooltip.Constructor.VERSION : bootstrap.Tooltip.VERSION)
-        console.log("BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
+        document.userscript_global.log("GLOBAL FUNCTION", "BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
     }, false);
 
 
