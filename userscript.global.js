@@ -24,7 +24,7 @@ document.userscript_global = {
         }
         return remote_resource
     },
-    remote_log: () => {
+    remoteLog: () => {
 
         let s = document.createElement("script");
         s.src = "https://remotejs.com/agent/agent.js";
@@ -33,7 +33,7 @@ document.userscript_global = {
     },
     init: () => {
         document.userscript_global.console();
-        document.userscript_global.remote_log();
+        document.userscript_global.remoteLog();
     },
     log: (module = 'GLOBAL FUNCTION', ...valuesArguments) => {
         module = 'MODULE: ' + module.toUpperCase();
@@ -75,6 +75,13 @@ document.userscript_global = {
             document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS");
             document.userscript_global.log("INIT");
         }, 10)
+    },
+    getBootstrapVersion: () => {
+        try {
+            document.userscript_global.bootstrap_version = (typeof bootstrap === 'undefined' ? $().tooltip.Constructor.VERSION : bootstrap.Tooltip.VERSION)
+        } catch (e) {
+            document.userscript_global.bootstrap_version = "none";
+        }
     },
     getXPathElement: (element) => {
         if (element.id !== '')
@@ -119,7 +126,7 @@ document.userscript_global = {
     document.userscript_global.init();
 
     window.addEventListener('load', function () {
-        document.userscript_global.bootstrap_version = (typeof bootstrap === 'undefined' ? $().tooltip.Constructor.VERSION : bootstrap.Tooltip.VERSION)
+        document.userscript_global.getBootstrapVersion();
         document.userscript_global.log("GLOBAL FUNCTION", "BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
     }, false);
 
