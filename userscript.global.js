@@ -8,8 +8,8 @@
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
-// @resource CONSOLE_LOG_JS     https://patik.github.io/console.log-wrapper/consolelog.js
-// @resource CONSOLE_LOG_DETAILS_JS     https://patik.github.io/console.log-wrapper/consolelog.detailprint.js
+// @resource CONSOLE_LOG_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
+// @resource CONSOLE_LOG_DETAILS_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.detailprint.js
 // ==/UserScript==
 
 document.userscript_global = {
