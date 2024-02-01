@@ -423,6 +423,11 @@ document.module_video_controller = {
         if (!document.module_video_controller.video_info.valid) return;
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
+        if (document.module_video_controller.in_fullscreen)
+            document.module_video_controller.video.removeClass("us-video-fullscreen");
+        else
+            document.module_video_controller.video.addClass("us-video-fullscreen");
+
         document.module_video_controller.update_controls();
     },
     speed: (value) => {
@@ -481,13 +486,13 @@ document.module_video_controller = {
             document.module_video_controller.img_fullscreen_off.show();*/
             document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-on");
             document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-off");
-            document.module_video_controller.video.removeClass("us-video-fullscreen");
+
         } else {
             /*document.module_video_controller.img_fullscreen_off.hide();
             document.module_video_controller.img_fullscreen_on.show();*/
             document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-off");
             document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-on");
-            document.module_video_controller.video.addClass("us-video-fullscreen");
+
         }
 
         /*if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
