@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Title</title>
     <link href="https://unpkg.com/basscss@8.0.2/css/basscss.min.css" rel="stylesheet">
 </head>
-<body>
 <style>
     #us-video-controls-panel {
         background: rgb(43, 42, 50, 1);
-        border-radius: 5px;
-        bottom: 3px;
+        position: fixed;
+        /*border-radius: 5px;*/
+        bottom: 0;
+        left: 0;
+        right: 0;
         color: #fff;
         font-size: 16px;
         height: auto;
-        left: 6px;
         padding: 3px;
-        position: fixed;
-        right: 6px;
         text-decoration: none;
         transition: .2s;
         z-index: 99999
@@ -83,14 +83,15 @@
 
 
     .us-video-controls-progress {
-        background-color: #e0e0e0;
+        position: relative;
+        background-color: silver;
         border-radius: 3px;
         width: 100%
     }
 
     .us-video-controls-progress-fill {
         display: block;
-        background-color: #659cef;
+        background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
         border-radius: 3px;
         height: 20px;
         transition: width 200ms ease-in-out
@@ -99,57 +100,74 @@
     .us-video-controls-progress-text {
         position: absolute;
         left: 0;
-        bottom: 2px;
-        color: #000;
+        top: 2px;
+        color: white;
         font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: 12px;
         font-weight: 700;
         height: 20px;
-
         text-align: center;
         width: 100%;
-        z-index: 999999;
-        text-shadow: 3px 3px 2px rgba(181, 181, 181, 1);
+        z-index: 10;
+        text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
     }
 
 </style>
-<div class="clearfix border" id="us-video-controls-panel">
+<body>
+<div class="clearfix" id="us-video-controls-panel">
+
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-50" type="button" id=""></button>
+        <button class="ff-button ff-button-prev-50" type="button" id="us-video-controls-m50"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-25" type="button" id=""></button>
+        <button class="ff-button ff-button-prev-25" type="button" id="us-video-controls-m25"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-5" type="button" id=""></button>
+        <button class="ff-button ff-button-prev-5" type="button" id="us-video-controls-m5"></button>
     </div>
 
 
     <div class="col col-1">
-        <button class="ff-button ff-button-next-play" type="button" id=""></button>
+        <button class="ff-button" type="button"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-fullscreen-on" type="button" id=""></button>
+        <button class="ff-button" type="button"></button>
     </div>
 
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-play" type="button" id="us-video-controls-play"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-fullscreen-on" type="button" id="us-video-controls-f50"></button>
+    </div>
 
     <div class="col col-1">
-        <button class="ff-button ff-button-next-5" type="button" id=""></button>
+        <button class="ff-button" type="button"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-25" type="button" id=""></button>
+        <button class="ff-button" type="button"></button>
+    </div>
+
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-5" type="button" id="us-video-controls-p5"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-50" type="button" id=""></button>
+        <button class="ff-button ff-button-next-25" type="button" id="us-video-controls-p25"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-50" type="button" id="us-video-controls-p50"></button>
     </div>
 
     <div class="col col-12">
         <div class="us-video-controls-progress">
-            <span class="us-video-controls-progress-fill" style="width: 100%;"></span>
-            <div class=us-video-controls-progress-text>100%</d>
-            </div>
+            <span class="us-video-controls-progress-fill" style="width: 50%;"></span>
+            <span class=us-video-controls-progress-text>100%</span>
         </div>
     </div>
 
+    <!--<div class="col col-12">
+        <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
+    </div>-->
+</div>
 </body>
 </html>

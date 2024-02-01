@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.8
+// @version             0.9
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -15,6 +15,7 @@
 // @homepageURL         https://github.com/bigbear2
 
 // @resource     PURE_CSS   https://www.official1off.com/apps/shared/pure-min.css
+// @resource     BASE_CSS   https://unpkg.com/basscss@8.0.2/css/basscss.min.css
 
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -205,7 +206,8 @@ document.module_video = {
         }
         document.module_video.log("", "INIT CONTROLLER");
 
-        document.module_video.setResource("PURE_CSS", true);
+        //document.module_video.setResource("PURE_CSS", true);
+        document.module_video.setResource("BASE_CSS", true);
         //document.module_video.set_actual_video(video);
 
         document.module_video_controller.init(video);
@@ -296,7 +298,7 @@ document.module_video_controller = {
         document.module_video_controller.video = video;
 //document.module_video.actual_video.ownerDocument.location.href
         let data = document.module_video_controller.getOffset(video);
-        let html = document.module_video_controller.html_controller();
+        let html = document.module_video_controller.html_controller_bootstrap();
         html += document.module_video_controller.html_display_text(data);
 
         $("body").append(html);
@@ -310,7 +312,7 @@ document.module_video_controller = {
         document.module_video_controller.btn_next_25 = $("#us-video-controls-p25");
         document.module_video_controller.btn_next_50 = $("#us-video-controls-p50");
         document.module_video_controller.progress_bar = $(".us-video-controls-progress");
-        document.module_video_controller.range_speed = $("#us-video-controls-speed");
+        //document.module_video_controller.range_speed = $("#us-video-controls-speed");
         document.module_video_controller.lbl_display_text = $(".us-video-display-text");
 
         document.module_video_controller.img_play = $("#us-video-controls-img-play");
@@ -322,34 +324,34 @@ document.module_video_controller = {
             document.module_video_controller.seeking(evt);
         });
 
+        /*
+               document.module_video_controller.range_speed.on("click", (evt) => {
+                   let value = evt.currentTarget.value;
+                   console.log(value);
+                   document.module_video_controller.speed(value);
+               });
 
-        document.module_video_controller.range_speed.on("click", (evt) => {
-            let value = evt.currentTarget.value;
-            console.log(value);
-            document.module_video_controller.speed(value);
-        });
-
-        addEventListenerAll(document.module_video_controller.range_speed, (evt) => {
-            console.log(evt.type);
-        });
+               addEventListenerAll(document.module_video_controller.range_speed, (evt) => {
+                   console.log(evt.type);
+               });
 
 
-        /*document.module_video_controller.range_speed.on('mouseup', (event) => {
-            let value = event.currentTarget.value;
-            console.log("mouseup", value);
-            document.module_video_controller.speed_control.down = false;
-        }, {passive: true});
-        document.module_video_controller.range_speed.on('mousedown', (event) => {
-            let value = event.currentTarget.value;
-            console.log("mousedown", value);
-            document.module_video_controller.speed_control.down = true;
-        }, {passive: true});
-        document.module_video_controller.range_speed.on('mousemove', (event) => {
-            let value = event.currentTarget.value;
-            if (document.module_video_controller.speed_control.down)
-                console.log("mousemove", value);
-        }, {passive: true});
-*/
+              document.module_video_controller.range_speed.on('mouseup', (event) => {
+                   let value = event.currentTarget.value;
+                   console.log("mouseup", value);
+                   document.module_video_controller.speed_control.down = false;
+               }, {passive: true});
+               document.module_video_controller.range_speed.on('mousedown', (event) => {
+                   let value = event.currentTarget.value;
+                   console.log("mousedown", value);
+                   document.module_video_controller.speed_control.down = true;
+               }, {passive: true});
+               document.module_video_controller.range_speed.on('mousemove', (event) => {
+                   let value = event.currentTarget.value;
+                   if (document.module_video_controller.speed_control.down)
+                       console.log("mousemove", value);
+               }, {passive: true});
+       */
 
         document.module_video_controller.progress_bar.on("click", (evt) => {
             document.module_video_controller.progress(evt);
@@ -460,23 +462,31 @@ document.module_video_controller = {
         if (!document.module_video_controller.init_controller) return;
 
         if (document.module_video_controller.video_info.play) {
-            document.module_video_controller.img_play.hide();
-            document.module_video_controller.img_pause.show();
+            document.module_video_controller.btn_play.removeClass("ff-button-next-play");
+            document.module_video_controller.btn_play.addClass("ff-button-next-pause");
+            /*document.module_video_controller.img_play.hide();
+            document.module_video_controller.img_pause.show();*/
         } else {
-            document.module_video_controller.img_pause.hide();
-            document.module_video_controller.img_play.show();
+            document.module_video_controller.btn_play.removeClass("ff-button-next-pause");
+            document.module_video_controller.btn_play.addClass("ff-button-next-play");
+            /*document.module_video_controller.img_pause.hide();
+            document.module_video_controller.img_play.show();*/
         }
 
         if (document.module_video_controller.in_fullscreen) {
-            document.module_video_controller.img_fullscreen_on.hide();
-            document.module_video_controller.img_fullscreen_off.show();
+            /*document.module_video_controller.img_fullscreen_on.hide();
+            document.module_video_controller.img_fullscreen_off.show();*/
+            document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-on");
+            document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-off");
         } else {
-            document.module_video_controller.img_fullscreen_off.hide();
-            document.module_video_controller.img_fullscreen_on.show();
+            /*document.module_video_controller.img_fullscreen_off.hide();
+            document.module_video_controller.img_fullscreen_on.show();*/
+            document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-off");
+            document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-on");
         }
 
-        if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
-            document.module_video_controller.speed(1);
+        /*if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
+            document.module_video_controller.speed(1);*/
     },
     display_text_show: (text = null, duration = 4000) => {
         if (!document.module_video_controller.video_info.valid) return;
@@ -739,37 +749,168 @@ document.module_video_controller = {
 </style>
 <div class="us-video-display-text" style="display: none;" >00:00</div>`;
     },
-    html_controller_bootstrap: (data) => {
+    html_controller_bootstrap: () => {
         return `
 <style>
-
-
     #us-video-controls-panel {
-        background: dimgrey;
-        border-radius: 5px;
-        bottom: 3px;
+        background: rgb(43, 42, 50, 1);
+        position: fixed;
+        /*border-radius: 5px;*/
+        bottom: 0;
+        left: 0;
+        right: 0;
         color: #fff;
         font-size: 16px;
-        height: 70px;
-        left: 6px;
+        height: auto;
         padding: 3px;
-        position: fixed;
-        right: 6px;
         text-decoration: none;
         transition: .2s;
         z-index: 99999
     }
-    </style>
-    
-    <div>
-<div class="container">
-    <div class="row">
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4"></div>
-        <div class="col-sm-4"></div>
-        <div class="col-sm-12"></div>
+
+    .ff-button {
+        background: transparent;
+        border: 0;
+        width: 26px;
+        height: 26px;
+        margin: 6px;
+    }
+
+    .ff-button:active {
+        box-shadow: 7px 6px 18px 1px rgba(0, 0, 0, 0.24);
+        transform: translateY(2px);
+    }
+
+
+    .col {
+        text-align: center;
+    }
+
+    .ff-button-prev-50 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-50.png") center no-repeat;
+    }
+
+    .ff-button-next-50 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-50.png") center no-repeat;
+    }
+
+    .ff-button-prev-25 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-25.png") center no-repeat;
+    }
+
+    .ff-button-next-25 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-25.png") center no-repeat;
+    }
+
+    .ff-button-prev-5 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-5.png") center no-repeat;
+    }
+
+    .ff-button-next-5 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-5.png") center no-repeat;
+    }
+
+    .ff-button-next-play {
+        background: url("https://www.official1off.com/apps/shared/img/ff-play.png") center no-repeat;
+    }
+
+    .ff-button-next-pause {
+        background: url("https://www.official1off.com/apps/shared/img/ff-pause.png") center no-repeat;
+    }
+
+    .ff-button-fullscreen-off {
+        background: url("https://www.official1off.com/apps/shared/img/ff-fullscreen-off.png") center no-repeat;
+    }
+
+    .ff-button-fullscreen-on {
+        background: url("https://www.official1off.com/apps/shared/img/ff-fullscreen-on.png") center no-repeat;
+    }
+
+
+    .us-video-controls-progress {
+        position: relative;
+        background-color: silver;
+        border-radius: 3px;
+        width: 100%
+    }
+
+    .us-video-controls-progress-fill {
+        display: block;
+        background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
+        border-radius: 3px;
+        height: 20px;
+        transition: width 200ms ease-in-out
+    }
+
+    .us-video-controls-progress-text {
+        position: absolute;
+        left: 0;
+        top: 2px;
+        color: white;
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        height: 20px;
+        text-align: center;
+        width: 100%;
+        z-index: 10;
+        text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
+    }
+
+</style>
+<body>
+<div class="clearfix" id="us-video-controls-panel">
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-50" type="button" id="us-video-controls-m50"></button>
     </div>
-</div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-25" type="button" id="us-video-controls-m25"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-5" type="button" id="us-video-controls-m5"></button>
+    </div>
+
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
+    </div>
+
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-play" type="button" id="us-video-controls-play"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-fullscreen-on" type="button" id="us-video-controls-f50"></button>
+    </div>
+
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
+    </div>
+
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-5" type="button" id="us-video-controls-p5"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-25" type="button" id="us-video-controls-p25"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-50" type="button" id="us-video-controls-p50"></button>
+    </div>
+
+    <div class="col col-12">
+        <div class="us-video-controls-progress">
+            <span class="us-video-controls-progress-fill" style="width: 50%;"></span>
+            <span class=us-video-controls-progress-text>100%</span>
+        </div>
+    </div>
+
+    <!--<div class="col col-12">
+        <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
+    </div>-->
 </div>
 `;
     }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.8
+// @version      0.9
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
