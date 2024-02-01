@@ -424,9 +424,9 @@ document.module_video_controller = {
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
         if (document.module_video_controller.in_fullscreen)
-            document.module_video_controller.video.removeClass("us-video-fullscreen");
+            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
         else
-            document.module_video_controller.video.addClass("us-video-fullscreen");
+            $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
 
         document.module_video_controller.update_controls();
     },
