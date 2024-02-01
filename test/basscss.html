@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://unpkg.com/basscss@8.0.2/css/basscss.min.css" rel="stylesheet">
+</head>
+<body>
+<style>
+    #us-video-controls-panel {
+        background: rgb(43, 42, 50, 1);
+        border-radius: 5px;
+        bottom: 3px;
+        color: #fff;
+        font-size: 16px;
+        height: auto;
+        left: 6px;
+        padding: 3px;
+        position: fixed;
+        right: 6px;
+        text-decoration: none;
+        transition: .2s;
+        z-index: 99999
+    }
+
+    .ff-button {
+        background: transparent;
+        border: 0;
+        width: 26px;
+        height: 26px;
+        margin: 6px;
+    }
+
+    .ff-button:active {
+        box-shadow: 7px 6px 18px 1px rgba(0, 0, 0, 0.24);
+        transform: translateY(2px);
+    }
+
+
+    .col {
+        text-align: center;
+    }
+
+    .ff-button-prev-50 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-50.png") center no-repeat;
+    }
+
+    .ff-button-next-50 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-50.png") center no-repeat;
+    }
+
+    .ff-button-prev-25 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-25.png") center no-repeat;
+    }
+
+    .ff-button-next-25 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-25.png") center no-repeat;
+    }
+
+    .ff-button-prev-5 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-prev-5.png") center no-repeat;
+    }
+
+    .ff-button-next-5 {
+        background: url("https://www.official1off.com/apps/shared/img/ff-next-5.png") center no-repeat;
+    }
+
+    .ff-button-next-play {
+        background: url("https://www.official1off.com/apps/shared/img/ff-play.png") center no-repeat;
+    }
+
+    .ff-button-next-pause {
+        background: url("https://www.official1off.com/apps/shared/img/ff-pause.png") center no-repeat;
+    }
+
+    .ff-button-fullscreen-off {
+        background: url("https://www.official1off.com/apps/shared/img/ff-fullscreen-off.png") center no-repeat;
+    }
+
+    .ff-button-fullscreen-on {
+        background: url("https://www.official1off.com/apps/shared/img/ff-fullscreen-on.png") center no-repeat;
+    }
+
+
+    .us-video-controls-progress {
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        width: 100%
+    }
+
+    .us-video-controls-progress-fill {
+        display: block;
+        background-color: #659cef;
+        border-radius: 3px;
+        height: 20px;
+        transition: width 200ms ease-in-out
+    }
+
+    .us-video-controls-progress-text {
+        position: absolute;
+        left: 0;
+        bottom: 2px;
+        color: #000;
+        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        height: 20px;
+
+        text-align: center;
+        width: 100%;
+        z-index: 999999;
+        text-shadow: 3px 3px 2px rgba(181, 181, 181, 1);
+    }
+
+</style>
+<div class="clearfix border" id="us-video-controls-panel">
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-50" type="button" id=""></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-25" type="button" id=""></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-5" type="button" id=""></button>
+    </div>
+
+
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-play" type="button" id=""></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-fullscreen-on" type="button" id=""></button>
+    </div>
+
+
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-5" type="button" id=""></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-25" type="button" id=""></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-next-50" type="button" id=""></button>
+    </div>
+
+    <div class="col col-12">
+        <div class="us-video-controls-progress">
+            <span class="us-video-controls-progress-fill" style="width: 100%;"></span>
+            <div class=us-video-controls-progress-text>100%</d>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

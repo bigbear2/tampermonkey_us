@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jsonview demo</title>
+    <link href='main.css' rel='stylesheet'>
+</head>
+<body>
+
+<table class="ff-table warn">
+    <tbody>
+    <tr>
+        <td class="">
+            <i class="ff-info"></i>&nbsp;
+        </td>
+        <td class="">
+
+        </td>
+        <td class=""></td>
+    </tr>
+
+    <tr>
+        <td class="" colspan="3">
+            <div id=""></div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="root"></div>
+
+<script type="text/javascript" src="jsonview.js"></script>
+<script type="text/javascript">
+
+    function output(inp) {
+        document.body.appendChild(document.createElement('pre')).innerHTML = inp;
+    }
+
+    function syntaxHighlight(json) {
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+
+    }
+
+    var obj = {a: 1, 'b': 'foo', c: [false, 'false', null, 'null', {d: {e: 1.3e5, f: '1.3e5'}}]};
+    var str = JSON.stringify(obj);//, undefined, 4);
+
+    output(str);
+    output(syntaxHighlight(str));
+
+
+</script>
+<script type="text/javascript">
+    let y = '{ "givenName": "Vas","surName": "Sudanagunta"}';
+    let _data = {
+        "givenName": "Vas",
+        "surName": "Sudanagunta",
+        "children": [
+            {
+                "givenName": "Natalia",
+                "age": 5
+            },
+            {
+                "givenName": "Aida",
+                "age": 17
+            }
+        ],
+        "address": {
+            "state": "NY",
+            "city": "Brooklyn",
+            "street": "718 Marcus Garvey Ave"
+        },
+        "emptyObject": {}
+    };
+
+    let test_info = {
+        master: "JSConsole",
+        type: "info",
+        data: _data,
+        line: 0,
+        href: "https://stackoverflow.com/questions/3231459/how-can-i-create-unique-ids-with-javascript"
+    }
+
+    function log(value) {
+        if (typeof bootstrap === 'string') value = JSON.parse(value);
+
+
+        let id = "id" + Math.random().toString(16).slice(2)
+        let s = document.createElement("div");
+        s.classList.add('ff-log');
+        s.innerHTML = `
+ <table class="ff-table warn">
+    <tbody>
+    <tr>
+        <td class=""><i class="ff-${value.type}"></i></td>
+        <td style="padding-left: 6px">${value.href}</td>
+        <td class="" style="width: fit-content">${value.line}</td>
+    </tr>
+
+    <tr>
+        <td class=""></td>
+        <td class="" colspan="2">
+            <div id="${id}"></div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+        `;
+        document.body.appendChild(s);
+
+        const tree = jsonview.create(value.data);
+        jsonview.render(tree, document.querySelector('#' + id));
+        //jsonview.expand(tree);
+
+    }
+
+    log(test_info)
+</script>
+</body>
+</html>
