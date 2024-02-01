@@ -323,6 +323,9 @@ document.module_video_controller = {
         $(".us-video-controls-seek").on("click", (evt) => {
             document.module_video_controller.seeking(evt);
         });
+        $(".us-video-seek").on("click", (evt) => {
+            document.module_video_controller.seeking(evt);
+        });
 
         /*
                document.module_video_controller.range_speed.on("click", (evt) => {
@@ -478,11 +481,13 @@ document.module_video_controller = {
             document.module_video_controller.img_fullscreen_off.show();*/
             document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-on");
             document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-off");
+            document.module_video_controller.video.removeClass("us-video-fullscreen");
         } else {
             /*document.module_video_controller.img_fullscreen_off.hide();
             document.module_video_controller.img_fullscreen_on.show();*/
             document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-off");
             document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-on");
+            document.module_video_controller.video.addClass("us-video-fullscreen");
         }
 
         /*if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
@@ -856,20 +861,28 @@ document.module_video_controller = {
         z-index: 10;
         text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
     }
-
+    
+    .us-video-fullscreen {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100vw;
+        height: 80vh;
+        z-index: 88888;
+    }
 </style>
-<body>
-<div class="clearfix" id="us-video-controls-panel">
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-50" type="button" id="us-video-controls-m50"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-25" type="button" id="us-video-controls-m25"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-5" type="button" id="us-video-controls-m5"></button>
-    </div>
 
+<div class="clearfix" id="us-video-controls-panel">
+     <div class="col col-1">
+        <button class="ff-button ff-button-prev-50 us-video-seek" type="button" id="us-video-controls-m50"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-25 us-video-seek" type="button" id="us-video-controls-m25"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button ff-button-prev-5 us-video-seek" type="button" id="us-video-controls-m5"></button>
+    </div>
+    
     <div class="col col-1">
         <button class="ff-button" type="button"></button>
     </div>
@@ -892,13 +905,13 @@ document.module_video_controller = {
     </div>
 
     <div class="col col-1">
-        <button class="ff-button ff-button-next-5" type="button" id="us-video-controls-p5"></button>
+        <button class="ff-button ff-button-next-5 us-video-seek" type="button" id="us-video-controls-p5"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-25" type="button" id="us-video-controls-p25"></button>
+        <button class="ff-button ff-button-next-25 us-video-seek" type="button" id="us-video-controls-p25"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-50" type="button" id="us-video-controls-p50"></button>
+        <button class="ff-button ff-button-next-50 us-video-seek" type="button" id="us-video-controls-p50"></button>
     </div>
 
     <div class="col col-12">

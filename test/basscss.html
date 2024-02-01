@@ -112,20 +112,27 @@
         text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
     }
 
+    .us-video-fullscreen {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100vw;
+        height: 80vh;
+        z-index: 88888;
+    }
 </style>
 <body>
 <div class="clearfix" id="us-video-controls-panel">
 
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-50" type="button" id="us-video-controls-m50"></button>
+        <button class="ff-button ff-button-prev-50 us-video-seek" type="button" id="us-video-controls-m50"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-25" type="button" id="us-video-controls-m25"></button>
+        <button class="ff-button ff-button-prev-25 us-video-seek" type="button" id="us-video-controls-m25"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-prev-5" type="button" id="us-video-controls-m5"></button>
+        <button class="ff-button ff-button-prev-5 us-video-seek" type="button" id="us-video-controls-m5"></button>
     </div>
-
 
     <div class="col col-1">
         <button class="ff-button" type="button"></button>
@@ -149,13 +156,13 @@
     </div>
 
     <div class="col col-1">
-        <button class="ff-button ff-button-next-5" type="button" id="us-video-controls-p5"></button>
+        <button class="ff-button ff-button-next-5 us-video-seek" type="button" id="us-video-controls-p5"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-25" type="button" id="us-video-controls-p25"></button>
+        <button class="ff-button ff-button-next-25 us-video-seek" type="button" id="us-video-controls-p25"></button>
     </div>
     <div class="col col-1">
-        <button class="ff-button ff-button-next-50" type="button" id="us-video-controls-p50"></button>
+        <button class="ff-button ff-button-next-50 us-video-seek" type="button" id="us-video-controls-p50"></button>
     </div>
 
     <div class="col col-12">
