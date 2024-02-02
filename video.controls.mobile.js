@@ -424,8 +424,8 @@ document.module_video_controller = {
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
         if (document.module_video_controller.in_fullscreen) {
-            $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
             $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
+            $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
         } else {
             $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
             $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
@@ -877,7 +877,7 @@ document.module_video_controller = {
         top: 0px;
         width: 100vw;
         height: 100vh;
-        z-index: 88888;
+        z-index: 77777;
     }
 
     .us-video-fullscreen {
