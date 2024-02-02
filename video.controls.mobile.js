@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.10
+// @version             0.11
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -868,12 +868,12 @@ document.module_video_controller = {
     }
     
     .us-video-fullscreen {
-        position: fixed;
-        left: 0px;
-        top: 0px;
-        width: 100vw;
-        height: 80vh;
-        z-index: 88888;
+        position: fixed!important;
+        left: 0px!important;
+        top: 0px!important;
+        width: 100vw!important;
+        height: 80vh!important;
+        z-index: 88888!important;
     }
 </style>
 
