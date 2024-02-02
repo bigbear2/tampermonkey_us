@@ -935,8 +935,8 @@ document.module_video_controller = {
 
     <div class="col col-12">
         <div class="us-video-controls-progress">
-            <span class="us-video-controls-progress-fill" style="width: 50%;"></span>
-            <span class=us-video-controls-progress-text>100%</span>
+            <span class="us-video-controls-progress-fill" style="width: 0%;"></span>
+            <span class=us-video-controls-progress-text>0%</span>
         </div>
     </div>
 
