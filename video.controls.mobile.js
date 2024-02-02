@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.12
+// @version             0.13
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
