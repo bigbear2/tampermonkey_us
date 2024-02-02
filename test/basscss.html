@@ -6,6 +6,7 @@
     <title>Title</title>
     <link href="https://unpkg.com/basscss@8.0.2/css/basscss.min.css" rel="stylesheet">
 </head>
+<body>
 <style>
     #us-video-controls-panel {
         background: rgb(43, 42, 50, 1);
@@ -112,16 +113,27 @@
         text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
     }
 
+    .us-video-fullscreen-div {
+        position: fixed;
+        background: black;
+        left: 0px;
+        top: 0px;
+        width: 100vw;
+        height: 100vh;
+        z-index: 88888;
+    }
+
     .us-video-fullscreen {
         position: fixed;
         left: 0px;
         top: 0px;
         width: 100vw;
         height: 80vh;
-        z-index: 88888;
+        z-index: 89999;
     }
 </style>
-<body>
+
+<div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
 
     <div class="col col-1">

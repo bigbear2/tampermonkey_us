@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.11
+// @version             0.12
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -423,10 +423,13 @@ document.module_video_controller = {
         if (!document.module_video_controller.video_info.valid) return;
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
-        if (document.module_video_controller.in_fullscreen)
-            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
-        else
+        if (document.module_video_controller.in_fullscreen) {
             $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
+            $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
+        } else {
+            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
+            $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
+        }
 
         document.module_video_controller.update_controls();
     },
@@ -867,6 +870,16 @@ document.module_video_controller = {
         text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
     }
     
+     .us-video-fullscreen-div {
+        position: fixed;
+        background: black;
+        left: 0px;
+        top: 0px;
+        width: 100vw;
+        height: 100vh;
+        z-index: 88888;
+    }
+
     .us-video-fullscreen {
         position: fixed!important;
         left: 0px!important;
@@ -877,6 +890,7 @@ document.module_video_controller = {
     }
 </style>
 
+<div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
      <div class="col col-1">
         <button class="ff-button ff-button-prev-50 us-video-seek" type="button" id="us-video-controls-m50"></button>
