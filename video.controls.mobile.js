@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.15
+// @version             0.18
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -292,12 +292,56 @@ document.module_video_controller = {
     img_pause: null,
     img_fullscreen_on: null,
     img_fullscreen_off: null,
+    table_sites: [],
+    find_data: (data, key, value) => {
+        for (let i = 0; i < data.length; i++) {
+            let obj_value = data[i][key];
+            if (obj_value == value) return i;
+        }
+        return -1;
+    },
+    set_visibility_controls: (value) => {
+        if (value) {
+            $("#us-video-controls-panel").show(300);
+            document.module_video_controller.lbl_display_icon.hide(300);
+        } else {
+            $("#us-video-controls-panel").hide(300);
+            document.module_video_controller.lbl_display_icon.show(300);
+        }
+        document.module_video_controller.set_visibility_table(value);
+    },
+    set_visibility_table: (value) => {
+        //let is_visible = ($("#us-video-controls-panel").css('display') === 'none' || $("#us-video-controls-panel").css("visibility") === "hidden");
+        let host = window.location.host;
+        let idx = document.module_video_controller.find_data(document.module_video_controller.table_sites, 'host', host);
+        if (idx > -1) {
+            document.module_video_controller.table_sites[idx].visible = value;
+        } else {
+            document.module_video_controller.table_sites.push({
+                "host": host,
+                "visible": value,
+            })
+        }
+        GM_setValue("table_sites", JSON.stringify(document.module_video_controller.table_sites, null, 2));
+    },
+    get_visibility_table: () => {
+        let data = GM_getValue("table_sites", "[]");
+        document.module_video_controller.table_sites = JSON.parse(data);
+        let idx = document.module_video_controller.find_data(document.module_video_controller.table_sites, 'host', window.location.host);
+        if (idx > -1) {
+            let visible = document.module_video_controller.table_sites[idx].visible;
+            if (!visible) {
+                $("#us-video-controls-panel").hide();
+                document.module_video_controller.lbl_display_icon.show();
+            }
+        }
+    },
     init: (video) => {
         if (document.module_video_controller.init_controller) return;
         document.module_video_controller.init_controller = true;
 
         document.module_video_controller.video = video;
-//document.module_video.actual_video.ownerDocument.location.href
+        //document.module_video.actual_video.ownerDocument.location.href
         let data = document.module_video_controller.getOffset(video);
         let html = document.module_video_controller.html_controller_bootstrap();
         html += document.module_video_controller.html_display_text(data);
@@ -325,14 +369,14 @@ document.module_video_controller = {
         document.module_video_controller.img_fullscreen_on = $("#us-video-controls-img-on");
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
 
+        document.module_video_controller.get_visibility_table();
+        i
         document.module_video_controller.btn_close.on("click", (evt) => {
-            $("#us-video-controls-panel").hide(300);
-            document.module_video_controller.lbl_display_icon.show(300);
+            document.module_video_controller.set_visibility_controls(false);
         });
 
         document.module_video_controller.lbl_display_icon.on("click", (evt) => {
-            $("#us-video-controls-panel").show(300);
-            document.module_video_controller.lbl_display_icon.hide(300);
+            document.module_video_controller.set_visibility_controls(true);
         });
 
         $(".us-video-controls-seek").on("click", (evt) => {
@@ -530,7 +574,6 @@ document.module_video_controller = {
             "left": `${data.left + 5}px`,
             "top": `${data.top + 5}px`,
         });
-
 
 
         if (text === null) text = document.module_video_controller.video_info.text;
@@ -932,6 +975,9 @@ document.module_video_controller = {
         width: 100vw!important;
         height: 80vh!important;
         z-index: 88888!important;
+        padding: 0!important;
+        margin: 0!important;
+        transform: rotate(90deg) scale(1.3);
     }
 </style>
 
