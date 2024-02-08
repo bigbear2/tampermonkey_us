@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.18
+// @version             0.19
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -370,7 +370,7 @@ document.module_video_controller = {
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
 
         document.module_video_controller.get_visibility_table();
-        i
+
         document.module_video_controller.btn_close.on("click", (evt) => {
             document.module_video_controller.set_visibility_controls(false);
         });
