@@ -2,14 +2,14 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.13
+// @version             0.14
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 
 // @supportURL          https://github.com/ni554n/userscripts/issues
 // @license             MIT
-// @icon                https://www.google.com/s2/favicons?sz=64&domain=logitech.com
+// @icon                https://www.official1off.com/apps/shared/img/ff-setting.png
 // @require             http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @author              Fabio Lucci
 // @homepageURL         https://github.com/bigbear2
@@ -286,6 +286,7 @@ document.module_video_controller = {
     range_speed: null,
 
     lbl_display_text: null,
+    lbl_display_icon: null,
 
     img_play: null,
     img_pause: null,
@@ -300,8 +301,11 @@ document.module_video_controller = {
         let data = document.module_video_controller.getOffset(video);
         let html = document.module_video_controller.html_controller_bootstrap();
         html += document.module_video_controller.html_display_text(data);
+        html += document.module_video_controller.html_display_icon(data);
 
         $("body").append(html);
+
+        document.module_video_controller.btn_close = $("#us-video-controls-close");
 
         document.module_video_controller.btn_prev_5 = $("#us-video-controls-m5");
         document.module_video_controller.btn_prev_25 = $("#us-video-controls-m25");
@@ -314,11 +318,22 @@ document.module_video_controller = {
         document.module_video_controller.progress_bar = $(".us-video-controls-progress");
         //document.module_video_controller.range_speed = $("#us-video-controls-speed");
         document.module_video_controller.lbl_display_text = $(".us-video-display-text");
+        document.module_video_controller.lbl_display_icon = $(".us-video-display-icon");
 
         document.module_video_controller.img_play = $("#us-video-controls-img-play");
         document.module_video_controller.img_pause = $("#us-video-controls-img-pause");
         document.module_video_controller.img_fullscreen_on = $("#us-video-controls-img-on");
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
+
+        document.module_video_controller.btn_close.on("click", (evt) => {
+            $("#us-video-controls-panel").hide(300);
+            document.module_video_controller.lbl_display_icon.show(300);
+        });
+
+        document.module_video_controller.lbl_display_icon.on("click", (evt) => {
+            $("#us-video-controls-panel").show(300);
+            document.module_video_controller.lbl_display_icon.hide(300);
+        });
 
         $(".us-video-controls-seek").on("click", (evt) => {
             document.module_video_controller.seeking(evt);
@@ -498,6 +513,12 @@ document.module_video_controller = {
 
         }
 
+        let data = document.module_video_controller.video_info.rect;
+        document.module_video_controller.lbl_display_icon.css({
+            "left": `${data.left + 5}px`,
+            "top": `${data.top + 5}px`,
+        });
+
         /*if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
             document.module_video_controller.speed(1);*/
     },
@@ -509,6 +530,8 @@ document.module_video_controller = {
             "left": `${data.left + 5}px`,
             "top": `${data.top + 5}px`,
         });
+
+
 
         if (text === null) text = document.module_video_controller.video_info.text;
         document.module_video_controller.lbl_display_text.text(text);
@@ -757,10 +780,26 @@ document.module_video_controller = {
         font-size: 24px;
         text-shadow: 3px 3px 2px rgba(48, 52, 160, 1);
         color: white;
-        z-index: 99999;
+        z-index: 99998;
     }
 </style>
 <div class="us-video-display-text" style="display: none;" >00:00</div>`;
+    },
+    html_display_icon: (data) => {
+        return `
+<style>
+    .us-video-display-icon {
+        position: fixed;
+        left: ${data.left}px;
+        top: ${data.top}px;
+        width: 26px;
+        height: 26px;        
+        z-index: 99999;
+        
+    }
+</style>
+<img src="https://www.official1off.com/apps/shared/img/ff-tune.png" alt="" width="26" height="26" class="us-video-display-icon">
+`;
     },
     html_controller_bootstrap: () => {
         return `
@@ -799,8 +838,14 @@ document.module_video_controller = {
         text-align: center;
     }
 
+    .ff-button-close {
+        background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
+        
+    }
+
     .ff-button-prev-50 {
         background: url("https://www.official1off.com/apps/shared/img/ff-prev-50.png") center no-repeat;
+        
     }
 
     .ff-button-next-50 {
@@ -893,6 +938,14 @@ document.module_video_controller = {
 <div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
      <div class="col col-1">
+        <button class="ff-button ff-button-close us-video-seek" type="button" id="us-video-controls-close"></button>
+    </div>  
+    
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
+    </div>
+    
+    <div class="col col-1">
         <button class="ff-button ff-button-prev-50 us-video-seek" type="button" id="us-video-controls-m50"></button>
     </div>
     <div class="col col-1">
@@ -905,9 +958,6 @@ document.module_video_controller = {
     <div class="col col-1">
         <button class="ff-button" type="button"></button>
     </div>
-    <div class="col col-1">
-        <button class="ff-button" type="button"></button>
-    </div>
 
     <div class="col col-1">
         <button class="ff-button ff-button-next-play" type="button" id="us-video-controls-play"></button>
@@ -916,9 +966,6 @@ document.module_video_controller = {
         <button class="ff-button ff-button-fullscreen-on" type="button" id="us-video-controls-f50"></button>
     </div>
 
-    <div class="col col-1">
-        <button class="ff-button" type="button"></button>
-    </div>
     <div class="col col-1">
         <button class="ff-button" type="button"></button>
     </div>
