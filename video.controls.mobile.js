@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.14
+// @version             0.15
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -792,13 +792,13 @@ document.module_video_controller = {
         position: fixed;
         left: ${data.left}px;
         top: ${data.top}px;
-        width: 26px;
-        height: 26px;        
+        width: 30px;
+        height: 30px;        
         z-index: 99999;
         
     }
 </style>
-<img src="https://www.official1off.com/apps/shared/img/ff-tune.png" alt="" width="26" height="26" class="us-video-display-icon">
+<img src="https://www.official1off.com/apps/shared/img/ff-tune.png" alt="" width="30" height="30" class="us-video-display-icon" style="display: none;">
 `;
     },
     html_controller_bootstrap: () => {
