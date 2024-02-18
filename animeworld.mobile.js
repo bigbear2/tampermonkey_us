@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animeworld Mobile
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  Animeworld Mobile
 // @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
@@ -14,6 +14,7 @@
 // ==/UserScript==
 
 'use strict';
+
 
 function aLog(text, error = true) {
     let tag = 'color: white; background: #367dc3 ; font-size: 14px; margin-right:5px; padding:4px';
@@ -117,6 +118,7 @@ document.selectAll = function (copy) {
 
 
 document.userscript_aw = {
+    notifications: [],
     status_text_2: ['', 'IN CORSO', 'COMPLETATI', 'IN PAUSA', 'DROPPATI', 'N/A', 'DA GUARDARE'],
     status_text: ['', 'Watching', 'Completed', 'On Hold', 'Dropped', 'N/A', 'Plan to Watch'],
     status_color: ['', '#4855db', '#47c951', '#3A6378', '#d45050', 'white', '#ddeb73'],
@@ -303,6 +305,20 @@ document.userscript_aw = {
         }
         return "";
     },
+    checkNotifications: function () {
+        document.userscript_aw.notifications = [];
+        let elm_notifications = $(".is-notification-not-read");
+        for (let i = 0; i < elm_notifications.length; i++) {
+            let elm = elm_notifications[i];
+            let current_elm = $(elm).find(".header-notification-click")[0];
+            let title = $(current_elm).text();
+            title = title.replace("Nuovo episodio di ", "").trim().toLowerCase();
+
+
+            document.userscript_aw.notifications.push(title);
+        }
+        console.log(document.userscript_aw.notifications);
+    },
     addAnimeStatus: function (data) {
         let self = this;
 
@@ -320,7 +336,9 @@ document.userscript_aw = {
             let bg_color = document.userscript_aw.status_color[idx];
 
             if (bg_color !== "white") {
-                var div = `<div class="anime-tag" style="position: absolute;top: 0px;color: white;background:${bg_color};padding: 8px;">${status}</div>`;
+                let div = `<div class="anime-tag" style="position: absolute;top: 0px;color: white;background:${bg_color};padding: 8px;">${status}</div>`;
+                if (document.userscript_aw.notifications.indexOf(title) > -1)
+                    div += `<div class="anime-tag-new" style="position: absolute;bottom: 0px;right: 0; color: white;background:crimson;padding: 8px;">NEW</div>`;
                 $(this).parent().find(".poster").append(div);
             }
 
@@ -500,6 +518,7 @@ document.userscript_aw = {
         let is_watchlist = (href.indexOf("/watchlist/") > 0);
         let is_mobile = window.mobileAndTabletCheck();
         try {
+            this.checkNotifications();
 
             if (is_play) {
                 $("#tags").remove();
