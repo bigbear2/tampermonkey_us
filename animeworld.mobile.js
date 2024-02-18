@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animeworld Mobile
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7
 // @description  Animeworld Mobile
 // @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
@@ -323,6 +323,7 @@ document.userscript_aw = {
         let self = this;
 
         $(".name").each(function (i) {
+            let title_en = $(this).text().toLowerCase();
             let title = $(this).attr("data-jtitle");
             if (title === undefined) return;
 
@@ -334,11 +335,13 @@ document.userscript_aw = {
             let idx = document.userscript_aw.status_text_2.indexOf(status);
 
             let bg_color = document.userscript_aw.status_color[idx];
+            let exist = $(this).parent().find(".poster").find(".anime-tag");
+            console.log(title, "|", title_en);
 
             if (bg_color !== "white") {
                 let div = `<div class="anime-tag" style="position: absolute;top: 0px;color: white;background:${bg_color};padding: 8px;">${status}</div>`;
-                if (document.userscript_aw.notifications.indexOf(title) > -1)
-                    div += `<div class="anime-tag-new" style="position: absolute;bottom: 0px;right: 0; color: white;background:crimson;padding: 8px;">NEW</div>`;
+                if (document.userscript_aw.notifications.indexOf(title_en) > -1)
+                    div += `<div class="anime-tag-new" style="position: absolute;bottom: 4px;right: 4px;border-radius: 20px; color: white;background:crimson;padding: 5px;border: 1px solid darkorange;">N.Ep</div>`;
                 $(this).parent().find(".poster").append(div);
             }
 
@@ -498,6 +501,7 @@ document.userscript_aw = {
             let title = $(this).text();
             let jtitle = $(this).attr("data-jtitle");
             if (jtitle === undefined) jtitle = title;
+
 
             jtitle = jtitle.toLowerCase();
             let status = me.storage[jtitle];
