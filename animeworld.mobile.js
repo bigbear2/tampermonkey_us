@@ -1,12 +1,11 @@
 // ==UserScript==
-// @name         Animeworld Links Download Views
+// @name         animeworld v0.2
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Animeworld Links Download Views
-// @author       bigbear2sfc
+// @version      0.2
+// @description  animeworld v0.2
+// @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=animeworld.so
-// @connect      localhost
 // @grant        unsafeWindow
 // @grant        GM_setValue
 // @grant        GM_getValue
