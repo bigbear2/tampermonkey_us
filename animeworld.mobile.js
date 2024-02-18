@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animeworld Mobile
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.8
 // @description  Animeworld Mobile
 // @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
@@ -498,7 +498,7 @@ document.userscript_aw = {
         `);
 
         $(".info > .name").each(function (i) {
-            let title = $(this).text();
+            let title = $(this).text().toLowerCase();
             let jtitle = $(this).attr("data-jtitle");
             if (jtitle === undefined) jtitle = title;
 
@@ -509,7 +509,10 @@ document.userscript_aw = {
             if (status !== undefined) {
                 let colore = me.coloreByStato(status);
                 $(this).css("font-weight", "bold");
-                $(this).append(`<br><span class="anime-status" style='background: ${colore}'>${status}</span>`);
+                let div = `<br><span class="anime-status" style='background: ${colore}'>${status}</span>`;
+                if (document.userscript_aw.notifications.indexOf(title) > -1)
+                    div += `<span class="anime-status" style='background: crimson; color: white; margin-left: 3px'>NEW</span>`;
+                $(this).append(div);
             }
 
 
