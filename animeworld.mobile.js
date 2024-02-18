@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Animeworld Mobile
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @description  Animeworld Mobile
 // @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
@@ -24,6 +24,10 @@ function aLog(text, error = true) {
         console.log('%cAWL' + '%c' + text, tag, 'color: black; background: #cfe3f7 ; font-size: 14px; padding:4px');
     }
 }
+
+jQuery.fn.outerHTML = function () {
+    return jQuery('<div />').append(this.eq(0).clone()).html();
+};
 
 function pad(num, size) {
     var s = "000000000" + num;
@@ -154,6 +158,16 @@ document.userscript_aw = {
                 break;
         }
         return colore
+    },
+    showLinksDownloadFDM: function () {
+        let html = $("#alternativeDownloadLink").outerHTML();
+        html = html.replace("alternativeDownloadLink", "alternativeDownloadLinkFDM");
+        $("#alternativeDownloadLink").parent().append(html);
+        let elm = $("#alternativeDownloadLinkFDM");
+        let href = "org.freedownloadmanager.fdm://" + encodeURIComponent(elm.attr("href"));
+        elm.attr("href", href);
+        elm.text("DOWNLOAD FDM");
+        console.log(href);
     },
     showLinksDownload: function () {
         let n_zero = 2;
@@ -531,6 +545,7 @@ document.userscript_aw = {
                 $("#tags").remove();
                 this.currentStatusClick();
                 this.currentStatus();
+                this.showLinksDownloadFDM();
                 if (!is_mobile) this.showLinksDownload();
             }
 
