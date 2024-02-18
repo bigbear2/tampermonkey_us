@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         animeworld v0.2
+// @name         Animeworld Mobile
 // @namespace    http://tampermonkey.net/
-// @version      0.2
-// @description  animeworld v0.2
+// @version      0.5
+// @description  Animeworld Mobile
 // @author       Fabio Lucci
 // @match        http*://www.animeworld.so/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=animeworld.so
