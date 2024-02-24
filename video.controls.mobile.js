@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.20
+// @version             0.21
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -16,6 +16,7 @@
 
 // @resource     PURE_CSS   https://www.official1off.com/apps/shared/pure-min.css
 // @resource     BASE_CSS   https://unpkg.com/basscss@8.0.2/css/basscss.min.css
+// @resource     DW_JS   https://js.zapjs.com/js/download.js
 
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -208,6 +209,7 @@ document.module_video = {
 
         //document.module_video.setResource("PURE_CSS", true);
         document.module_video.setResource("BASE_CSS", true);
+        document.module_video.setResource("DW_JS", false);
         //document.module_video.set_actual_video(video);
 
         document.module_video_controller.init(video);
@@ -350,6 +352,8 @@ document.module_video_controller = {
         $("body").append(html);
 
         document.module_video_controller.btn_close = $("#us-video-controls-close");
+        document.module_video_controller.btn_download = $("#us-video-controls-download");
+        document.module_video_controller.btn_audio = $("#us-video-controls-audio");
 
         document.module_video_controller.btn_prev_5 = $("#us-video-controls-m5");
         document.module_video_controller.btn_prev_25 = $("#us-video-controls-m25");
@@ -370,6 +374,11 @@ document.module_video_controller = {
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
 
         document.module_video_controller.get_visibility_table();
+
+        document.module_video_controller.btn_download.on("click", (evt) => {
+            let link = document.module_video_controller.video.currentSrc;
+            download(link);
+        });
 
         document.module_video_controller.btn_close.on("click", (evt) => {
             document.module_video_controller.set_visibility_controls(false);
@@ -927,6 +936,18 @@ document.module_video_controller = {
         background: url("https://www.official1off.com/apps/shared/img/ff-fullscreen-on.png") center no-repeat;
     }
 
+    .ff-button-download {
+        background: url("https://www.official1off.com/apps/shared/img/ff-download.png") center no-repeat;
+    }
+    
+    .ff-button-audio-on {
+        background: url("https://www.official1off.com/apps/shared/img/ff-audio-on.png") center no-repeat;
+    }
+    
+    .ff-button-audio-off {
+        background: url("https://www.official1off.com/apps/shared/img/ff-audio-off.png") center no-repeat;
+    }
+
 
     .us-video-controls-progress {
         position: relative;
@@ -985,10 +1006,10 @@ document.module_video_controller = {
 <div class="clearfix" id="us-video-controls-panel">
      <div class="col col-1">
         <button class="ff-button ff-button-close us-video-seek" type="button" id="us-video-controls-close"></button>
-    </div>  
+     </div>  
     
     <div class="col col-1">
-        <button class="ff-button" type="button"></button>
+          <button class="ff-button ff-button-download" type="button" id="us-video-controls-download"></button>
     </div>
     
     <div class="col col-1">
@@ -1013,7 +1034,7 @@ document.module_video_controller = {
     </div>
 
     <div class="col col-1">
-        <button class="ff-button" type="button"></button>
+        <button class="ff-button ff-button-audio-on " type="button" id="us-video-controls-audio"></button>
     </div>
 
     <div class="col col-1">
