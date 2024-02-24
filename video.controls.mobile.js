@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.23
+// @version             0.24
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -344,6 +344,8 @@ document.module_video_controller = {
     init: (video) => {
         if (document.module_video_controller.init_controller) return;
         document.module_video_controller.init_controller = true;
+        console.log("VIEWSIZE", document.module_video_controller.vw, document.module_video_controller.vh);
+
         document.module_video_controller.is_viewport_vertical = document.module_video_controller.vw < document.module_video_controller.vh;
 
         document.module_video_controller.video = video;
