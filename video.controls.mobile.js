@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.22
+// @version             0.23
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -89,7 +89,7 @@ document.module_video = {
     log_event: (event) => {
         let video = event.target;
         let type = event.type;
-        let path = document.userscript_global.getXPathElement(video);
+        //let path = document.userscript_global.getXPathElement(video);
 
         if (type !== "timeupdate") document.module_video.log("", type);
         document.module_video.parse_event(event);
@@ -98,7 +98,7 @@ document.module_video = {
     parse_event: (event) => {
         let video = event.target;
         let type = event.type;
-        let path = document.userscript_global.getXPathElement(video);
+        //let path = document.userscript_global.getXPathElement(video);
 
         switch (type) {
             case "loadstart":
@@ -298,7 +298,7 @@ document.module_video_controller = {
     find_data: (data, key, value) => {
         for (let i = 0; i < data.length; i++) {
             let obj_value = data[i][key];
-            if (obj_value == value) return i;
+            if (obj_value === value) return i;
         }
         return -1;
     },
@@ -394,24 +394,27 @@ document.module_video_controller = {
         });
         document.module_video_controller.btn_download.on("click", (evt) => {
             let src = document.module_video_controller.video.currentSrc;
-            try {
-                download(src);
-            } catch (e) {
 
+            if (confirm("Try new download?\n" + src)) {
+                try {
+                    download(src);
+                } catch (e) {
+                    alert(e.message);
+                }
+            } else {
+                try {
+
+                    let link = document.createElement('a');
+                    link.download = "video.mp4";
+                    link.href = "video/mp4";
+                    link.click();
+                    link.remove();
+
+                } catch (e) {
+                    alert(e.message);
+                }
             }
-            try {
-
-                let link = document.createElement('a');
-                link.download = "video.mp4";
-                link.href = "video/mp4";
-                link.click();
-                link.remove();
-
-            } catch (e) {
-
-            }
-
-            window.open(src, "blank");
+            //window.open(src, "blank");
 
         });
 
@@ -697,163 +700,6 @@ document.module_video_controller = {
             height: rect.height,
         };
     },
-    html_controller: () => {
-        let is_mobile = false;
-        let csl = "us-video-controls-seek"
-        return `
-<style>
-    #us-video-controls-fullscreen {
-        background: #030303;
-        bottom: 0;
-        left: 0;
-        position: fixed;
-        right: 0;
-        top: 0;
-        z-index: 88888
-    }
-
-    #us-video-controls-panel {
-        background: dimgrey;
-        border-radius: 5px;
-        bottom: 3px;
-        color: #fff;
-        font-size: 16px;
-        height: 90px;
-        left: 6px;
-        padding: 3px;
-        position: fixed;
-        right: 6px;
-        text-decoration: none;
-        transition: .2s;
-        z-index: 99999
-    }
-
-    #us-video-controls-panel:hover {
-        /*opacity: .9*/
-    }
-
-    .us-video-controls-progress {
-        background-color: #e0e0e0;
-        border-radius: 3px;
-        box-shadow: inset 0 1px 3px #0003;
-        padding: 3px;
-        width: 99%
-    }
-
-    .us-video-controls-progress-fill {
-        background-color: #659cef;
-        border-radius: 3px;
-        display: block;
-        height: 20px;
-        transition: width 200ms ease-in-out
-    }
-
-    .us-video-controls-progress-text {
-        bottom: 28px;
-        color: #000;
-        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        height: 20px;
-        left: 0;
-        position: fixed;
-        text-align: center;
-        width: 100%;
-        z-index: 999999;
-        text-shadow: 3px 3px 2px rgba(181, 181, 181, 1);
-    }
-
-    .pure-button {
-        height: 40px;
-        padding: 10px 7px;
-        width: 40px
-    }
-
-    #us-video-controls-f50 {
-        margin-left: 5px
-    }
-
-    #us-video-controls-play {
-        margin-right: 5px
-    }
-
-    .us-rotate-video-on {
-        transform: rotate(90deg) scale(1.5, 1.5);
-        position: fixed;
-        z-index: 89999;
-    }
-
-    .us-video-display-text {
-        background: rgba(8, 8, 8, 0.3) ;
-        padding: 5px;
-        position: fixed;
-        left: 5px;
-        top: 5px;
-         display: inline-block;
-        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 20px;
-        text-shadow: 3px 2px 2px rgba(128, 0, 0, 1);
-        border-radius: 3px;
-        z-index: 99999;
-    }
-</style>
-
-
-<div id="us-video-controls-panel" class="sidenav">
-    <form class="pure-form pure-g">
-
-        <div class="pure-u-1" style="text-align: center">
-            <div class="pure-button-group" role="group" aria-label="...">
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-m50" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/prev-50.png" width="20" height="20" alt=""/>
-                </button>
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-m25" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/prev-25.png" width="20" height="20" alt=""/>
-                </button>
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-m5" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/prev-5.png" width="20" height="20" alt=""/>
-                </button>
-
-                <button class="pure-button us-video-controls " id="us-video-controls-f50" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/fullscreen-on.png" width="20" height="20"
-                         id="us-video-controls-img-on" alt=""/>
-                    <img src="https://www.official1off.com/apps/shared/img/fullscreen-off.png" width="20" height="20"
-                         id="us-video-controls-img-off" style="display: none;" alt=""/>
-                </button>
-                <button class="pure-button us-video-controls " id="us-video-controls-play" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/play.png" width="20" height="20"
-                         id="us-video-controls-img-play" alt=""/>
-                    <img src="https://www.official1off.com/apps/shared/img/pause.png" width="20" height="20"
-                         id="us-video-controls-img-pause" style="display: none;" alt=""/>
-                </button>
-
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-p5" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/next-5.png" width="20" height="20" alt=""/>
-                </button>
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-p25" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/next-25.png" width="20" height="20" alt=""/>
-                </button>
-                <button class="pure-button us-video-controls ${csl}" id="us-video-controls-p50" type="button">
-                    <img src="https://www.official1off.com/apps/shared/img/next-50.png" width="20" height="20" alt=""/>
-                </button>
-
-            </div>
-        </div>
-
-        <div class="pure-u-1" style="margin-top: 3px">
-            <div class="us-video-controls-progress">
-                <span class="us-video-controls-progress-fill" style="width: 100%;"></span>
-                <span class=us-video-controls-progress-text>100%</span>
-            </div>
-        </div>
-        <div class="pure-u-1" style="margin-top: 3px">
-           <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
-        </div>
-    </form>
-</div>
-        `;
-
-    },
     html_display_text: (data) => {
         return `
 <style>
@@ -1017,8 +863,8 @@ document.module_video_controller = {
      .us-video-fullscreen-div {
         position: fixed;
         background: black;
-        left: 0px;
-        top: 0px;
+        left: 0;
+        top: 0;
         width: 100vw;
         height: 100vh;
         z-index: 77777;
@@ -1026,8 +872,8 @@ document.module_video_controller = {
 
     .us-video-fullscreen {
         position: fixed!important;
-        left: 0px!important;
-        top: 0px!important;
+        left: 0!important;
+        top: 0!important;
         width: 100vw!important;
         height: 80vh!important;
         z-index: 88888!important;
@@ -1084,7 +930,7 @@ document.module_video_controller = {
 
     <div class="col col-12">
         <div class="us-video-controls-progress">
-            <span class="us-video-controls-progress-fill" style="width: 0%;"></span>
+            <span class="us-video-controls-progress-fill" style="width: 0;"></span>
             <span class=us-video-controls-progress-text>0%</span>
         </div>
     </div>
