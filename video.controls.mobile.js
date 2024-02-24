@@ -274,6 +274,9 @@ document.module_video_controller = {
         x_end: 0,
         y_end: 0,
     },
+    vw: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+    vh: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
+    is_viewport_vertical: false,
     init_controller: false,
     in_fullscreen: false,
     btn_prev_5: null,
@@ -341,6 +344,7 @@ document.module_video_controller = {
     init: (video) => {
         if (document.module_video_controller.init_controller) return;
         document.module_video_controller.init_controller = true;
+        document.module_video_controller.is_viewport_vertical = document.module_video_controller.vw < document.module_video_controller.vh;
 
         document.module_video_controller.video = video;
         //document.module_video.actual_video.ownerDocument.location.href
@@ -532,9 +536,13 @@ document.module_video_controller = {
         if (document.module_video_controller.in_fullscreen) {
             $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
             $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
+            if (document.module_video_controller.is_viewport_vertical)
+                $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate");
         } else {
             $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
             $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
+            $("#ff-div-fullscreen").removeClass("us-video-fullscreen-rotate");
+
         }
 
         document.module_video_controller.update_controls();
@@ -875,11 +883,15 @@ document.module_video_controller = {
         left: 0!important;
         top: 0!important;
         width: 100vw!important;
-        height: 80vh!important;
-        z-index: 88888!important;
+        height: 93vh;
+        z-index: 99999!important;
         padding: 0!important;
         margin: 0!important;
+
+    }
+    .us-video-fullscreen-rotate {
         transform: rotate(90deg) scale(1.3);
+        height: 80vh!important;
     }
 </style>
 
