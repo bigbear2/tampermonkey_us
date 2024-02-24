@@ -1057,9 +1057,6 @@ document.module_video_controller = {
         <button class="ff-button ff-button-prev-5 us-video-seek" type="button" id="us-video-controls-m5"></button>
     </div>
     
-    <div class="col col-1">
-        <button class="ff-button" type="button"></button>
-    </div>
 
     <div class="col col-1">
         <button class="ff-button ff-button-next-play" type="button" id="us-video-controls-play"></button>
@@ -1080,6 +1077,9 @@ document.module_video_controller = {
     </div>
     <div class="col col-1">
         <button class="ff-button ff-button-next-50 us-video-seek" type="button" id="us-video-controls-p50"></button>
+    </div>
+    <div class="col col-1">
+        <button class="ff-button" type="button"></button>
     </div>
 
     <div class="col col-12">
