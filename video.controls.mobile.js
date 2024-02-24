@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.21
+// @version             0.22
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -375,9 +375,44 @@ document.module_video_controller = {
 
         document.module_video_controller.get_visibility_table();
 
+        document.module_video_controller.btn_audio.on("click", (evt) => {
+            if (document.module_video_controller.video.muted) {
+                document.module_video_controller.video.setAttribute("muted", false);
+                document.module_video_controller.video.muted = false;
+                document.module_video_controller.video.volume = 1;
+
+                document.module_video_controller.btn_audio.removeClass("ff-button-audio-off");
+                document.module_video_controller.btn_audio.addClass("ff-button-audio-on");
+            } else {
+                document.module_video_controller.video.setAttribute("muted", true);
+                document.module_video_controller.video.muted = true;
+
+                document.module_video_controller.btn_audio.removeClass("ff-button-audio-om");
+                document.module_video_controller.btn_audio.addClass("ff-button-audio-off");
+            }
+
+        });
         document.module_video_controller.btn_download.on("click", (evt) => {
-            let link = document.module_video_controller.video.currentSrc;
-            download(link);
+            let src = document.module_video_controller.video.currentSrc;
+            try {
+                download(src);
+            } catch (e) {
+
+            }
+            try {
+
+                let link = document.createElement('a');
+                link.download = "video.mp4";
+                link.href = "video/mp4";
+                link.click();
+                link.remove();
+
+            } catch (e) {
+
+            }
+
+            window.open(src, "blank");
+
         });
 
         document.module_video_controller.btn_close.on("click", (evt) => {
