@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.27
+// @version             0.28
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -887,7 +887,7 @@ document.module_video_controller = {
 
     .us-video-controls-progress {
         position: relative;
-        background-color: silver;
+        background-color: dimgr;
         border-radius: 3px;
         width: 100%
     }
@@ -896,19 +896,19 @@ document.module_video_controller = {
         display: block;
         background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
         border-radius: 3px;
-        height: 20px;
+        height: 26px;
         transition: width 200ms ease-in-out
     }
 
     .us-video-controls-progress-text {
         position: absolute;
         left: 0;
-        top: 2px;
+        top: 4px;
         color: white;
         font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        height: 20px;
+        font-size: 15px;
+        /*font-weight: 700;*/
+        height: 26px;
         text-align: center;
         width: 100%;
         z-index: 10;
