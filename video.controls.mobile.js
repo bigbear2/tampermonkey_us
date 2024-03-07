@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.26
+// @version             0.27
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -99,6 +99,7 @@ document.module_video = {
         let video = event.target;
         let type = event.type;
         //let path = document.userscript_global.getXPathElement(video);
+        if (video.clientWidth < 200) return;
 
         switch (type) {
             case "loadstart":
@@ -560,9 +561,10 @@ document.module_video_controller = {
             if (document.module_video_controller.is_viewport_vertical)
                 $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate");
         } else {
-            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
             $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
-            $("#ff-div-fullscreen").removeClass("us-video-fullscreen-rotate");
+            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
+            if (document.module_video_controller.is_viewport_vertical)
+                $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen-rotate");
 
         }
 
@@ -946,97 +948,102 @@ document.module_video_controller = {
 
 <div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
-    <div class="col col-12">
-        
-        <div class="col col-2">
-            <button class="ff-button ff-button-text ff-fucsia" type="button" id="us-video-speed-text">S: 1</button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button us-video-speed ff-fucsia" type="button">-1</button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button us-video-speed ff-red" type="button">R</button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button us-video-speed ff-fucsia" type="button">+1</button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-        <div class="col col-1">
-            <button class="ff-button" type="button"></button>
-        </div>
-        
-    </div>
+    <div style="">
+        <div class="col col-12">
     
-     <div class="col col-1">
-        <button class="ff-button ff-button-close ff-red us-video-seek" type="button" id="us-video-controls-close"></button>
-     </div>  
+            <div class="col col-2">
+                <button class="ff-button ff-button-text ff-fucsia" type="button" id="us-video-speed-text">S: 1</button>
+            </div>
     
-    <div class="col col-1">
-          <button class="ff-button ff-button-download" type="button" id="us-video-controls-download"></button>
-    </div>
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
     
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-50 ff-lime us-video-seek" type="button" id="us-video-controls-m50"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-25 ff-lime us-video-seek" type="button" id="us-video-controls-m25"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-prev-5 ff-lime us-video-seek" type="button" id="us-video-controls-m5"></button>
-    </div>
     
-
-    <div class="col col-1">
-        <button class="ff-button ff-button-next-play ff-blue" type="button" id="us-video-controls-play"></button>
+            <div class="col col-1">
+                <button class="ff-button ff-button-download ff-blue" type="button" id="us-video-controls-download"></button>
+            </div>
+    
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button us-video-speed ff-fucsia" type="button">-1</button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button us-video-speed ff-red" type="button">R</button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button us-video-speed ff-fucsia" type="button">+1</button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button ff-button-fullscreen-on ff-blue" type="button" id="us-video-controls-f50"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button ff-button-audio-on ff-blue" type="button" id="us-video-controls-audio"></button>
+            </div>
+    
+           <!-- <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>-->
+    
+        </div>
+    
+        <div class="col col-12">
+        
+            <div class="col col-1">
+                <button class="ff-button ff-button-close ff-red us-video-seek" type="button" id="us-video-controls-close"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button ff-button-prev-50 ff-lime us-video-seek" type="button" id="us-video-controls-m50"></button>
+            </div>
+            <div class="col col-1">
+                <button class="ff-button ff-button-prev-25 ff-lime us-video-seek" type="button" id="us-video-controls-m25"></button>
+            </div>
+            <div class="col col-1">
+                <button class="ff-button ff-button-prev-5 ff-lime us-video-seek" type="button" id="us-video-controls-m5"></button>
+            </div>
+    
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button ff-button-next-play ff-blue" type="button" id="us-video-controls-play"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button ff-button-next-5 ff-lime us-video-seek" type="button" id="us-video-controls-p5"></button>
+            </div>
+            <div class="col col-1">
+                <button class="ff-button ff-button-next-25 ff-lime us-video-seek" type="button" id="us-video-controls-p25"></button>
+            </div>
+            <div class="col col-1">
+                <button class="ff-button ff-button-next-50 ff-lime us-video-seek" type="button" id="us-video-controls-p50"></button>
+            </div>
+            
+        </div>
     </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-fullscreen-on ff-blue" type="button" id="us-video-controls-f50"></button>
-    </div>
-
-    <div class="col col-1">
-        <button class="ff-button ff-button-audio-on ff-blue" type="button" id="us-video-controls-audio"></button>
-    </div>
-
-    <div class="col col-1">
-        <button class="ff-button ff-button-next-5 ff-lime us-video-seek" type="button" id="us-video-controls-p5"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-next-25 ff-lime us-video-seek" type="button" id="us-video-controls-p25"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button ff-button-next-50 ff-lime us-video-seek" type="button" id="us-video-controls-p50"></button>
-    </div>
-    <div class="col col-1">
-        <button class="ff-button" type="button"></button>
-    </div>
-
     <div class="col col-12">
         <div class="us-video-controls-progress">
             <span class="us-video-controls-progress-fill" style="width: 0;"></span>
