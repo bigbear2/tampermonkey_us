@@ -941,14 +941,17 @@ document.module_video_controller = {
         height: 80vh!important;
     }
     
-    #us-video-speed-text{
-     
+    .col-container{
+        padding-left: 4px!important;
+    }
+    .col-1 {
+        width: 8.12333%!important;
     }
 </style>
 
 <div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
-    <div style="">
+    <div class="col-container">
         <div class="col col-12">
     
             <div class="col col-2">
@@ -993,9 +996,9 @@ document.module_video_controller = {
                 <button class="ff-button ff-button-audio-on ff-blue" type="button" id="us-video-controls-audio"></button>
             </div>
     
-           <!-- <div class="col col-1">
+            <div class="col col-1">
                 <button class="ff-button" type="button"></button>
-            </div>-->
+            </div>
     
         </div>
     
@@ -1008,7 +1011,11 @@ document.module_video_controller = {
             <div class="col col-1">
                 <button class="ff-button" type="button"></button>
             </div>
-    
+            
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+            
             <div class="col col-1">
                 <button class="ff-button ff-button-prev-50 ff-lime us-video-seek" type="button" id="us-video-controls-m50"></button>
             </div>
@@ -1042,6 +1049,7 @@ document.module_video_controller = {
                 <button class="ff-button ff-button-next-50 ff-lime us-video-seek" type="button" id="us-video-controls-p50"></button>
             </div>
             
+        
         </div>
     </div>
     <div class="col col-12">
