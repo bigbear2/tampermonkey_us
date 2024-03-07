@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.24
+// @version             0.25
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -899,6 +899,58 @@ document.module_video_controller = {
 
 <div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
+    <div class="col col-12">
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button">-1</button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button">R</button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button">+1</button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+        <div class="col col-1">
+            <button class="ff-button" type="button"></button>
+        </div>
+        
+    </div>
+    
      <div class="col col-1">
         <button class="ff-button ff-button-close us-video-seek" type="button" id="us-video-controls-close"></button>
      </div>  
