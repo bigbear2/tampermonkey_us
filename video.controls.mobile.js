@@ -99,7 +99,12 @@ document.module_video = {
         let video = event.target;
         let type = event.type;
         //let path = document.userscript_global.getXPathElement(video);
-        if (video.clientWidth < 200) return;
+        let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        let is_viewport_vertical = vw < vh;
+
+        if (is_viewport_vertical && video.clientWidth < 200) return;
+        if (!is_viewport_vertical && video.clientWidth < 320) return;
 
         switch (type) {
             case "loadstart":
