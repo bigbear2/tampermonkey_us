@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.28
+// @version             0.29
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -517,6 +517,18 @@ document.module_video_controller = {
         /*addEventListenerAll(document.module_video_controller.progress_bar[0], (evt) => {
             console.log(evt.type);
         });*/
+
+        document.module_video_controller.minimize = !document.module_video_controller.is_viewport_vertical;
+        if (document.module_video_controller.minimize) $(".us-video-grid").hide();
+        $("#us-video-controls-minimize").on("click",function () {
+            document.module_video_controller.minimize = !document.module_video_controller.minimize;
+            if (document.module_video_controller.minimize){
+                $(".us-video-grid").hide();
+            }else{
+                $(".us-video-grid").show();
+            }
+        })
+        document.module_video_controller.keyboard_init();
     },
     seeking: (evt) => {
         console.log("module_video_controller.seeking");
@@ -731,6 +743,63 @@ document.module_video_controller = {
             height: rect.height,
         };
     },
+    keyboard_press: (key, code) => {
+        if (!document.module_video_controller.video_info.valid) return;
+        let video = document.module_video_controller.video;
+        console.debug("KEY", key, "CODE", code);
+
+        if (code > 57) {
+            let position = 0;
+            let part_fast = video.duration / 50;
+            let part_slow = video.duration / 25;
+            switch (code) {
+                case 187:
+                case 105 : //9
+                    position = part_slow;
+                    break;
+                case 186:
+                case 104: //8
+                    position = -part_slow;
+                    break;
+                case 191:
+                case 102: //6
+                    position = part_fast;
+                    break;
+                case 222:
+                case 101: //5
+                    position = -part_fast;
+                    break;
+                case 80:
+                case 99: //6
+                    position = 5;
+                    break;
+                case 192:
+                case 97: //5
+                    position = -5;
+                    break;
+            }
+
+            video.currentTime = video.currentTime + position;
+            document.module_video_controller.display_text_show(position.toString() + ' sec.');
+            return;
+        }
+
+        if (code >= 49 && code <= 57) {
+            let part = video.duration / 10;
+            let p = parseInt(key) * part;
+            video.currentTime = p;
+        }
+    },
+    keyboard_init: () => {
+        window.addEventListener('keydown', function (event) {
+            /*if (e.ctrlKey && e.keyCode == 90) {
+                // Ctrl + z pressed
+            }*/
+            const key = event.key;
+            const code = event.which;
+            document.module_video_controller.keyboard_press(key,code);
+        });
+    },
     html_display_text: (data) => {
         return `
 <style>
@@ -887,7 +956,7 @@ document.module_video_controller = {
 
     .us-video-controls-progress {
         position: relative;
-        background-color: dimgr;
+        background-color: dimgray;
         border-radius: 3px;
         width: 100%
     }
@@ -913,6 +982,12 @@ document.module_video_controller = {
         width: 100%;
         z-index: 10;
         text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
+    }
+    #us-video-controls-minimize{
+        background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
+        border: 0;
+        width: 95%;
+        height: 26px;
     }
     
      .us-video-fullscreen-div {
@@ -941,7 +1016,7 @@ document.module_video_controller = {
         height: 80vh!important;
     }
     
-    .col-container{
+    .us-video-grid{
         padding-left: 4px!important;
     }
     .col-1 {
@@ -951,7 +1026,7 @@ document.module_video_controller = {
 
 <div id="ff-div-fullscreen"></div>
 <div class="clearfix" id="us-video-controls-panel">
-    <div class="col-container">
+    <div class="us-video-grid">
         <div class="col col-12">
     
             <div class="col col-2">
@@ -1052,13 +1127,15 @@ document.module_video_controller = {
         
         </div>
     </div>
-    <div class="col col-12">
+    <div class="col col-11">
         <div class="us-video-controls-progress">
             <span class="us-video-controls-progress-fill" style="width: 0;"></span>
             <span class=us-video-controls-progress-text>0%</span>
         </div>
     </div>
-
+   <div class="col col-1">
+                <button class="" type="button" id="us-video-controls-minimize"></button>
+            </div>
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
