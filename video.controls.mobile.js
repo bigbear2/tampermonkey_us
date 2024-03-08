@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.29
+// @version             0.30
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -525,11 +525,11 @@ document.module_video_controller = {
 
         document.module_video_controller.minimize = !document.module_video_controller.is_viewport_vertical;
         if (document.module_video_controller.minimize) $(".us-video-grid").hide();
-        $("#us-video-controls-minimize").on("click",function () {
+        $("#us-video-controls-minimize").on("click", function () {
             document.module_video_controller.minimize = !document.module_video_controller.minimize;
-            if (document.module_video_controller.minimize){
+            if (document.module_video_controller.minimize) {
                 $(".us-video-grid").hide();
-            }else{
+            } else {
                 $(".us-video-grid").show();
             }
         })
@@ -537,12 +537,17 @@ document.module_video_controller = {
     },
     seeking: (evt) => {
         console.log("module_video_controller.seeking");
-        let id = evt.currentTarget.id.replace("us-video-controls-", "");
-        let is_prev = (id.includes("m"));
-        let seconds = parseInt(id.replace("p", "").replace("m", ""));
-        if (isNaN(seconds)) return;
-        if (is_prev) seconds = -1 * seconds;
-
+        let seconds;
+        let text = evt.currentTarget.innerText;
+        if (text === "N") {
+            seconds = document.module_video_controller.video.duration / 10;
+        } else {
+            let id = evt.currentTarget.id.replace("us-video-controls-", "");
+            let is_prev = (id.includes("m"));
+            seconds = parseInt(id.replace("p", "").replace("m", ""));
+            if (isNaN(seconds)) return;
+            if (is_prev) seconds = -1 * seconds;
+        }
         document.module_video_controller.video.currentTime += seconds;
         document.module_video_controller.display_text_show()
     },
@@ -629,11 +634,14 @@ document.module_video_controller = {
         if (document.module_video_controller.video_info.play) {
             document.module_video_controller.btn_play.removeClass("ff-button-next-play");
             document.module_video_controller.btn_play.addClass("ff-button-next-pause");
+            if (!document.module_video_controller.is_viewport_vertical)
+                document.module_video_controller.video.scrollIntoView();
             /*document.module_video_controller.img_play.hide();
             document.module_video_controller.img_pause.show();*/
         } else {
             document.module_video_controller.btn_play.removeClass("ff-button-next-pause");
             document.module_video_controller.btn_play.addClass("ff-button-next-play");
+
             /*document.module_video_controller.img_pause.hide();
             document.module_video_controller.img_play.show();*/
         }
@@ -802,7 +810,7 @@ document.module_video_controller = {
             }*/
             const key = event.key;
             const code = event.which;
-            document.module_video_controller.keyboard_press(key,code);
+            document.module_video_controller.keyboard_press(key, code);
         });
     },
     html_display_text: (data) => {
@@ -1027,6 +1035,9 @@ document.module_video_controller = {
     .col-1 {
         width: 8.12333%!important;
     }
+    .col-2 {
+        width: 16.22667%!important;
+    }
 </style>
 
 <div id="ff-div-fullscreen"></div>
@@ -1077,7 +1088,7 @@ document.module_video_controller = {
             </div>
     
             <div class="col col-1">
-                <button class="ff-button" type="button"></button>
+                <button class="ff-button ff-button-text ff-lime us-video-seek" type="button">N</button>
             </div>
     
         </div>
@@ -1131,16 +1142,19 @@ document.module_video_controller = {
             
         
         </div>
+        
+        
     </div>
+    
     <div class="col col-11">
         <div class="us-video-controls-progress">
             <span class="us-video-controls-progress-fill" style="width: 0;"></span>
             <span class=us-video-controls-progress-text>0%</span>
         </div>
     </div>
-   <div class="col col-1">
-                <button class="" type="button" id="us-video-controls-minimize"></button>
-            </div>
+    <div class="col col-1">
+        <button class="" type="button" id="us-video-controls-minimize"></button>
+    </div>
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
