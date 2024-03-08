@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.30
+// @version             0.32
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -17,6 +17,7 @@
 // @resource     PURE_CSS   https://www.official1off.com/apps/shared/pure-min.css
 // @resource     BASE_CSS   https://unpkg.com/basscss@8.0.2/css/basscss.min.css
 // @resource     DW_JS   https://js.zapjs.com/js/download.js
+// @resource     HAMMER_JS   https://raw.githubusercontent.com/bigbear2/tampermonkey_us/master/js/hammer.js
 
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -216,6 +217,7 @@ document.module_video = {
         //document.module_video.setResource("PURE_CSS", true);
         document.module_video.setResource("BASE_CSS", true);
         document.module_video.setResource("DW_JS", false);
+        document.module_video.setResource("HAMMER_JS", false);
         //document.module_video.set_actual_video(video);
 
         document.module_video_controller.init(video);
@@ -304,6 +306,12 @@ document.module_video_controller = {
     img_fullscreen_on: null,
     img_fullscreen_off: null,
     table_sites: [],
+    hammer: {
+        "manage": null,
+        "Swipe": null,
+        "square": null,
+        "deltaX": 0
+    },
     find_data: (data, key, value) => {
         for (let i = 0; i < data.length; i++) {
             let obj_value = data[i][key];
@@ -386,6 +394,8 @@ document.module_video_controller = {
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
 
         document.module_video_controller.get_visibility_table();
+
+        document.module_video_controller.gesture_init();
 
         document.module_video_controller.btn_audio.on("click", (evt) => {
             if (document.module_video_controller.video.muted) {
@@ -503,7 +513,7 @@ document.module_video_controller = {
             document.module_video_controller.fullscreen();
         });
 
-        document.module_video_controller.progress_bar.on('touchstart', (event) => {
+        /*document.module_video_controller.progress_bar.on('touchstart', (event) => {
             let elm = event.currentTarget;
             console.log(event.type, elm);
             document.module_video_controller.touch.x_start = event.changedTouches[0].screenX;
@@ -517,7 +527,7 @@ document.module_video_controller = {
             document.module_video_controller.touch.x_end = event.changedTouches[0].screenX;
             document.module_video_controller.touch.y_end = event.changedTouches[0].screenY;
             document.module_video_controller.gesture();
-        }, {passive: true});
+        }, {passive: true});*/
 
         /*addEventListenerAll(document.module_video_controller.progress_bar[0], (evt) => {
             console.log(evt.type);
@@ -533,6 +543,7 @@ document.module_video_controller = {
                 $(".us-video-grid").show();
             }
         })
+
         document.module_video_controller.keyboard_init();
     },
     seeking: (evt) => {
@@ -693,6 +704,27 @@ document.module_video_controller = {
             document.module_video_controller.display.show = false;
 
         }, duration);
+    },
+    gesture_init: () => {
+
+        document.module_video_controller.hammer.square = document.querySelector('.us-touch');
+        document.module_video_controller.hammer.manager = new Hammer.Manager(document.module_video_controller.hammer.square);
+        document.module_video_controller.hammer.Swipe = new Hammer.Swipe();
+        document.module_video_controller.hammer.manager.add(document.module_video_controller.hammer.Swipe);
+        document.module_video_controller.hammer.deltaX = 0;
+
+
+        document.module_video_controller.hammer.manager.on('swipe', function (e) {
+
+            document.module_video_controller.hammer.deltaX = document.module_video_controller.hammer.deltaX + e.deltaX;
+            let direction = e.offsetDirection;
+            if (direction === 4 || direction === 2) {
+                document.module_video_controller.video.currentTime +=
+                    document.module_video_controller.hammer.deltaX / 10;
+                console.debug("DELTA", document.module_video_controller.hammer.deltaX / 10, document.module_video_controller.hammer.deltaX)
+            }
+        });
+
     },
     gesture: () => {
         if (!document.module_video_controller.video_info.valid) return;
@@ -1147,9 +1179,9 @@ document.module_video_controller = {
     </div>
     
     <div class="col col-11">
-        <div class="us-video-controls-progress">
-            <span class="us-video-controls-progress-fill" style="width: 0;"></span>
-            <span class=us-video-controls-progress-text>0%</span>
+        <div class="us-video-controls-progress us-touch">
+            <span class="us-video-controls-progress-fill us-touch" style="width: 0;"></span>
+            <span class="us-video-controls-progress-text us-touch">0%</span>
         </div>
     </div>
     <div class="col col-1">
