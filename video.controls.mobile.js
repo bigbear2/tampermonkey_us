@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.33
+// @version             0.34
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -428,7 +428,7 @@ document.module_video_controller = {
 
                     let link = document.createElement('a');
                     link.download = "video.mp4";
-                    link.href = "video/mp4";
+                    link.href = src;
                     link.click();
                     link.remove();
 
