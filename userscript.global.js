@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.9
+// @version      0.10
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAfdJREFUOE+Fk0trFEEUhc+tdmYRySJbQYIGtxJxIogYIYvgxo1krSiJrozgXxElEGP8CyYrDdkERlSUrPMYiAp5YUhkMl3d9bpSlemxajbeVT36fHXq3GpCX91e27shsmwGzBNZxwxba12peccxVrUxC+tTI99iCVWTyQ/754tB8YqABwBI5AZkXNg21kGpMGbHWLS1+rPv9y7kfiEAvLgcFCsAbgaFY2SnOvEmCwPmsyVmNE2tPukhATD+6eAdgR5WClIWorAJQCkLY7uEAOHFL/cvPaZw53PZ58qNVwlpQPrMflXGOKh0jRVojO40D+dBmI4/Fh0Nik7ze9YxyjJ15YjmaLx52CLC5QRwqkCpATjHKPoAzLTlAQbgLAaEAN2/+3aDgw8yLgYUjS23SgLq8UYn173Eexk4xubvtDMACg/YJODK/wDKMraP+gDMG9RY2p4TRE9jgJQmhBZXrh12jtMrgPk1XXvfatQEvsZt9GH5tsV1Ih122zHAx2wb4SE1llpvBeFRJdDaoVRpy/baBscygc5j9uqTALi+vDtALD8Kwi0/9y3LZWp360hBV0zGGuzQXby4KHs/U4BAvhQITsi3zHYfU7t0+PXHA71tXoAZeu7F/rAeoLLvM8mIpxk0UUgzXBp2P0/0D2XcKojfYHZ0Pc7mL7QpGu6oHMpoAAAAAElFTkSuQmCC
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
+// @require      https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
+// @require      https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.detailprint.js
 // @resource CONSOLE_LOG_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
 // @resource CONSOLE_LOG_DETAILS_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.detailprint.js
 // ==/UserScript==
@@ -20,7 +22,12 @@ document.userscript_global = {
         if (is_style) {
             GM_addStyle(remote_resource);
         } else {
-            eval(remote_resource);
+            try{
+                eval(remote_resource);
+            }catch (e) {
+                console.debug("setResource", name, "FAILED")
+            }
+
         }
         return remote_resource
     },
@@ -73,8 +80,8 @@ document.userscript_global = {
         elm = document.documentElement.appendChild(elm);
         window.setTimeout(() => {
             document.documentElement.removeChild(elm);
-            document.userscript_global.setResource("CONSOLE_LOG_JS");
-            document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS");
+            //document.userscript_global.setResource("CONSOLE_LOG_JS");
+            //document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS");
             document.userscript_global.log("INIT");
         }, 10)
     },
