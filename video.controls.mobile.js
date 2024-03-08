@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.32
+// @version             0.33
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -216,8 +216,8 @@ document.module_video = {
 
         //document.module_video.setResource("PURE_CSS", true);
         document.module_video.setResource("BASE_CSS", true);
-        document.module_video.setResource("DW_JS", false);
-        document.module_video.setResource("HAMMER_JS", false);
+        /*document.module_video.setResource("DW_JS", false);
+        document.module_video.setResource("HAMMER_JS", false);*/
         //document.module_video.set_actual_video(video);
 
         document.module_video_controller.init(video);
@@ -395,7 +395,7 @@ document.module_video_controller = {
 
         document.module_video_controller.get_visibility_table();
 
-        document.module_video_controller.gesture_init();
+        //document.module_video_controller.gesture_init();
 
         document.module_video_controller.btn_audio.on("click", (evt) => {
             if (document.module_video_controller.video.muted) {
