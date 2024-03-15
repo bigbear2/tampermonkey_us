@@ -931,6 +931,9 @@ document.module_video_controller = {
     }
     
     .vc-range-text{
+        padding: 2px !important;;
+        height: auto !important;;
+        color: white !important;
         cursor: pointer;
         font-size: 10px;
         -webkit-transition: font-size 500ms;
@@ -1169,7 +1172,7 @@ document.module_video_controller = {
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
     <div class="col col-12 vc-range-div-text">
-         <span class="vc-range-text">00:00 / 00:00 - 0%</span>
+         <button class="ff-button vc-range-text" type="button">00:00 / 00:00 - 0%</button>
     </div>
     
     <div class="col col-12 vc-range-div">
