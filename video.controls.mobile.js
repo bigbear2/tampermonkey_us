@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.34
+// @version             0.35
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -107,6 +107,7 @@ document.module_video = {
         if (is_viewport_vertical && video.clientWidth < 200) return;
         if (!is_viewport_vertical && video.clientWidth < 320) return;
 
+
         switch (type) {
             case "loadstart":
                 break;
@@ -129,6 +130,21 @@ document.module_video = {
             case "play":
                 document.module_video.video_info.play = true;
                 document.module_video.set_actual_video(video);
+                /* $("#test-canvas").show();
+                 video.addEventListener('play', function () {
+                     let $this = this; //cache
+                     (function loop() {
+                         let canvas = document.querySelector("#canvas1");
+                         let ctx    = canvas.getContext('2d');
+                         let w = canvas.clientWidth;
+                         let h = canvas.clientHeight;
+                         if (!$this.paused && !$this.ended) {
+                             ctx.drawImage($this, 0, 0, w ,h);
+                             setTimeout(loop, 1000 / 30); // drawing at 30fps
+                         }
+                     })();
+                 }, 0);*/
+
                 break;
             case "pause":
                 document.module_video.video_info.play = false;
@@ -150,7 +166,9 @@ document.module_video = {
         if (!$(video).length) return;
 
         let duration = document.userscript_global.secondsToHms(video.duration);
+        let duration_seconds = video.duration;
         let currentTime = document.userscript_global.secondsToHms(video.currentTime);
+        let currentTime_seconds = video.currentTime;
         let playbackRate = video.playbackRate;
         let percent = Math.ceil((video.currentTime / video.duration) * 100);
         let text = currentTime + " / " + duration + " | " + `${percent}%`;  //" | Speed: " + playbackRate;
@@ -162,8 +180,10 @@ document.module_video = {
             "text": text,
             "percent": percent,
             "speed": playbackRate,
-            "currentTime": currentTime,
             "duration": duration,
+            "currentTime": currentTime,
+            "duration_seconds": duration_seconds,
+            "currentTime_seconds": currentTime_seconds,
             "play": document.module_video.video_info.play,
             "rect": {
                 "left": rect.left,
@@ -306,6 +326,7 @@ document.module_video_controller = {
     img_fullscreen_on: null,
     img_fullscreen_off: null,
     table_sites: [],
+    reange_touch: false,
     hammer: {
         "manage": null,
         "Swipe": null,
@@ -545,6 +566,13 @@ document.module_video_controller = {
         })
 
         document.module_video_controller.keyboard_init();
+        if (!document.module_video_controller.is_viewport_vertical) {
+            $("#us-video-controls-panel").addClass("us-video-controls-panel-desktop");
+        }
+
+
+        document.module_video_controller.init_slider();
+
     },
     seeking: (evt) => {
         console.log("module_video_controller.seeking");
@@ -592,12 +620,12 @@ document.module_video_controller = {
             $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
             $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
             if (document.module_video_controller.is_viewport_vertical)
-                $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate");
+                $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate-new");
         } else {
             $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
             $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
             if (document.module_video_controller.is_viewport_vertical)
-                $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen-rotate");
+                $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen-rotate-new");
 
         }
 
@@ -637,6 +665,72 @@ document.module_video_controller = {
         $(".us-video-controls-progress-text").html(document.module_video_controller.video_info.text);
         $(".us-video-display-text").text(document.module_video_controller.video_info.text);
 
+        document.module_video_controller.update_slider()
+
+
+    },
+    init_slider: () => {
+        let range = $("#range2");
+        range.attr("min", 0);
+        range.attr("max", document.module_video_controller.video.duration);
+        range.val(document.module_video_controller.video.currentTime)
+
+        const sliderEl = document.querySelector("#range2")
+        const sliderValue = document.querySelector(".value2")
+
+        sliderEl.addEventListener("input", (event) => {
+            const position = event.target.value;
+            const progress = (position / sliderEl.max) * 100;
+            sliderValue.textContent = Math.floor(progress).toString() + '%';
+            sliderEl.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
+            document.module_video_controller.range_show_info();
+        })
+
+        sliderEl.addEventListener("mousedown", (event) => {
+            document.module_video_controller.range_speed = true;
+            document.module_video_controller.range_show_info();
+        })
+        sliderEl.addEventListener("mouseup", (event) => {
+            document.module_video_controller.range_speed = false;
+            document.module_video_controller.video.currentTime = parseInt(event.target.value);
+        })
+        sliderEl.addEventListener("touchstart", (event) => {
+            document.module_video_controller.range_speed = true;
+            document.module_video_controller.range_show_info();
+        })
+        sliderEl.addEventListener("touchend", (event) => {
+            document.module_video_controller.range_speed = false;
+            document.module_video_controller.video.currentTime = parseInt(event.target.value);
+        })
+    },
+    range_show_info: () => {
+        let current_position = $("#range2").val();
+        let video = document.module_video_controller.video;
+        let duration = document.userscript_global.secondsToHms(video.duration);
+        let duration_seconds = video.duration;
+        let currentTime = document.userscript_global.secondsToHms(current_position);
+        let currentTime_seconds = current_position;
+        let playbackRate = video.playbackRate;
+        let percent = Math.ceil((current_position / video.duration) * 100);
+        let text = currentTime + " / " + duration + " | " + `${percent}%` + " | Speed: " + playbackRate;
+        $(".us-video-controls-range-text").html(text);
+    },
+    update_slider: () => {
+        if (document.module_video_controller.range_speed) return;
+
+        let range = $("#range2");
+        range.attr("min", 0);
+        range.attr("max", document.module_video_controller.video.duration);
+        range.val(document.module_video_controller.video.currentTime)
+
+        const sliderValue = document.querySelector(".value2")
+        const sliderEl = document.querySelector("#range2")
+        const tempSliderValue = document.module_video_controller.video.currentTime;
+
+
+        const progress = (tempSliderValue / sliderEl.max) * 100;
+        sliderValue.textContent = Math.floor(progress).toString() + '%';
+        sliderEl.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
     },
     update_controls: () => {
         if (!document.module_video_controller.video_info.valid) return;
@@ -882,6 +976,16 @@ document.module_video_controller = {
     html_controller_bootstrap: () => {
         return `
 <style>
+    #test-canvas{
+        position: absolute;
+        top: 201px;
+        left: 1px;
+        width: 100vw;
+        height: 80vh;
+        z-index: 9999999;
+        background: #2b542c;
+        display: none;
+    }
     #us-video-controls-panel {
         background: rgb(43, 42, 50, 1);
         position: fixed;
@@ -897,7 +1001,12 @@ document.module_video_controller = {
         transition: .2s;
         z-index: 99999
     }
-
+    
+    .us-video-controls-panel-desktop {
+        margin-left: 15%;
+        margin-right: 15%;
+    }
+    
     .ff-button {
         background: transparent;
         border: 0;
@@ -1061,6 +1170,20 @@ document.module_video_controller = {
         height: 80vh!important;
     }
     
+    
+    .us-video-fullscreen-rotate-new {
+        background-color: #64B5F6;
+        height: 100vw!important;
+        width: 100vh!important;
+        border: solid 1px black;
+        border-radius: 3px;
+        transform: rotate( 90deg );
+        /*transform-origin: left bottom;*/
+        margin-top: -101vw;
+        margin-left: -3vh;
+    }
+    
+    
     .us-video-grid{
         padding-left: 4px!important;
     }
@@ -1070,6 +1193,122 @@ document.module_video_controller = {
     .col-2 {
         width: 16.22667%!important;
     }
+    
+/* range 2 */
+.range-input {
+  -webkit-appearance: none;
+  appearance: none; 
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 6px;
+  background: #ccc;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none; 
+  height: 15px;
+  width: 15px;
+  background-color: #f50;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+.range-input::-moz-range-thumb {
+  height: 15px;
+  width: 15px;
+  background-color: #f50;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+.range-input::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+.range-input:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+.range-input:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+
+.range-input::-moz-range-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+.range-input:active::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+.range-input:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
+}
+
+.value2, .value3, .value4 {
+  font-size: 20px;    
+  width: 100%;
+  text-align: center;
+}
+
+/* range 2 */
+.range-input {
+  -webkit-appearance: none;
+  appearance: none; 
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 6px;
+  background: #ccc;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none; 
+  height: 15px;
+  width: 15px;
+  background-color: #f50;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+.range-input::-moz-range-thumb {
+  height: 15px;
+  width: 15px;
+  background-color: #f50;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+}
+
+.range-input::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+.range-input:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+.range-input:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+
+.range-input::-moz-range-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+.range-input:active::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+.range-input:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
+}
+
+.value2 {
+  font-size: 20px;    
+  width: 100%;
+  text-align: center;
+}
 </style>
 
 <div id="ff-div-fullscreen"></div>
@@ -1178,6 +1417,7 @@ document.module_video_controller = {
         
     </div>
     
+  
     <div class="col col-11">
         <div class="us-video-controls-progress us-touch">
             <span class="us-video-controls-progress-fill us-touch" style="width: 0;"></span>
@@ -1190,7 +1430,25 @@ document.module_video_controller = {
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
+    <div class="col col-12">
+         <span class="us-video-controls-range-text">0%</span>
+    </div>
+    
+    <div class="col col-12">
+        <div class="col col-11">
+            <div class="range">
+                <input type="range" min="0" max="50" value="0" id="range2" class="range-input" /> 
+            </div>
+        </div>
+        <div class="col col-1">
+            <div class="value2">0</div>
+        </div>
+    </div>
 </div>
+
+<!--<div id="test-canvas">
+    <canvas id="canvas1" style="width: 100%; height: 100%"></canvas>
+</div>-->
 `;
     }
 }
