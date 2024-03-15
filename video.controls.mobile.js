@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.35
+// @version             0.36
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -171,7 +171,7 @@ document.module_video = {
         let currentTime_seconds = video.currentTime;
         let playbackRate = video.playbackRate;
         let percent = Math.ceil((video.currentTime / video.duration) * 100);
-        let text = currentTime + " / " + duration + " | " + `${percent}%`;  //" | Speed: " + playbackRate;
+        let text = currentTime + " / " + duration + " | " + `${percent}%` +" | Speed: " + playbackRate;
 
         let rect = video.getBoundingClientRect();
 
@@ -660,28 +660,35 @@ document.module_video_controller = {
     update_timer: () => {
 
         if (!document.module_video_controller.video_info.valid) return;
+        if (document.module_video_controller.range_speed) return;
 
-        $(".us-video-controls-progress-fill").css("width", `${document.module_video_controller.video_info.percent}%`);
-        $(".us-video-controls-progress-text").html(document.module_video_controller.video_info.text);
         $(".us-video-display-text").text(document.module_video_controller.video_info.text);
+        $(".vc-range-text").html(document.module_video_controller.video_info.text);
 
-        document.module_video_controller.update_slider()
+        let range = document.querySelector("#vc-progress")
+        let currentTime = document.module_video_controller.video.currentTime;
 
+        
+        let progress = (currentTime / range.max) * 100;
+        range.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
+
+        range = $("#vc-progress");
+        range.attr("max", document.module_video_controller.video.duration);
+        range.val(currentTime);
 
     },
     init_slider: () => {
-        let range = $("#range2");
+        let range = $("#vc-progress");
         range.attr("min", 0);
         range.attr("max", document.module_video_controller.video.duration);
         range.val(document.module_video_controller.video.currentTime)
 
-        const sliderEl = document.querySelector("#range2")
-        const sliderValue = document.querySelector(".value2")
+        const sliderEl = document.querySelector("#vc-progress")
+
 
         sliderEl.addEventListener("input", (event) => {
             const position = event.target.value;
             const progress = (position / sliderEl.max) * 100;
-            sliderValue.textContent = Math.floor(progress).toString() + '%';
             sliderEl.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
             document.module_video_controller.range_show_info();
         })
@@ -689,10 +696,12 @@ document.module_video_controller = {
         sliderEl.addEventListener("mousedown", (event) => {
             document.module_video_controller.range_speed = true;
             document.module_video_controller.range_show_info();
+            $(".vc-range-text").addClass("vc-range-text-up");
         })
         sliderEl.addEventListener("mouseup", (event) => {
             document.module_video_controller.range_speed = false;
             document.module_video_controller.video.currentTime = parseInt(event.target.value);
+            $(".vc-range-text").removeClass("vc-range-text-up");
         })
         sliderEl.addEventListener("touchstart", (event) => {
             document.module_video_controller.range_speed = true;
@@ -704,7 +713,7 @@ document.module_video_controller = {
         })
     },
     range_show_info: () => {
-        let current_position = $("#range2").val();
+        let current_position = $("#vc-progress").val();
         let video = document.module_video_controller.video;
         let duration = document.userscript_global.secondsToHms(video.duration);
         let duration_seconds = video.duration;
@@ -713,24 +722,10 @@ document.module_video_controller = {
         let playbackRate = video.playbackRate;
         let percent = Math.ceil((current_position / video.duration) * 100);
         let text = currentTime + " / " + duration + " | " + `${percent}%` + " | Speed: " + playbackRate;
-        $(".us-video-controls-range-text").html(text);
+        $(".vc-range-text").html(text);
     },
     update_slider: () => {
-        if (document.module_video_controller.range_speed) return;
 
-        let range = $("#range2");
-        range.attr("min", 0);
-        range.attr("max", document.module_video_controller.video.duration);
-        range.val(document.module_video_controller.video.currentTime)
-
-        const sliderValue = document.querySelector(".value2")
-        const sliderEl = document.querySelector("#range2")
-        const tempSliderValue = document.module_video_controller.video.currentTime;
-
-
-        const progress = (tempSliderValue / sliderEl.max) * 100;
-        sliderValue.textContent = Math.floor(progress).toString() + '%';
-        sliderEl.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
     },
     update_controls: () => {
         if (!document.module_video_controller.video_info.valid) return;
@@ -1115,28 +1110,7 @@ document.module_video_controller = {
         width: 100%
     }
 
-    .us-video-controls-progress-fill {
-        display: block;
-        background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
-        border-radius: 3px;
-        height: 26px;
-        transition: width 200ms ease-in-out
-    }
-
-    .us-video-controls-progress-text {
-        position: absolute;
-        left: 0;
-        top: 4px;
-        color: white;
-        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 15px;
-        /*font-weight: 700;*/
-        height: 26px;
-        text-align: center;
-        width: 100%;
-        z-index: 10;
-        text-shadow: 3px 3px 2px rgba(10, 10, 10, 1);
-    }
+ 
     #us-video-controls-minimize{
         background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
         border: 0;
@@ -1194,6 +1168,17 @@ document.module_video_controller = {
         width: 16.22667%!important;
     }
     
+    .vc-range-text{
+        font-size: 10px;
+        -webkit-transition: font-size 500ms;
+       -moz-transition:  font-size 500ms;
+        -o-transition:  font-size 500ms;
+        transition:  font-size 500ms;
+    }
+    .vc-range-text-up{
+      font-size: 20px;
+    }
+    
 /* range 2 */
 .range-input {
   -webkit-appearance: none;
@@ -1246,12 +1231,6 @@ document.module_video_controller = {
   box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
 }
 
-.value2, .value3, .value4 {
-  font-size: 20px;    
-  width: 100%;
-  text-align: center;
-}
-
 /* range 2 */
 .range-input {
   -webkit-appearance: none;
@@ -1304,11 +1283,12 @@ document.module_video_controller = {
   box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
 }
 
-.value2 {
-  font-size: 20px;    
-  width: 100%;
-  text-align: center;
+.vc-range-div{
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 10px;
 }
+
 </style>
 
 <div id="ff-div-fullscreen"></div>
@@ -1418,30 +1398,20 @@ document.module_video_controller = {
     </div>
     
   
-    <div class="col col-11">
-        <div class="us-video-controls-progress us-touch">
-            <span class="us-video-controls-progress-fill us-touch" style="width: 0;"></span>
-            <span class="us-video-controls-progress-text us-touch">0%</span>
-        </div>
-    </div>
-    <div class="col col-1">
+ 
+    <!--<div class="col col-1">
         <button class="" type="button" id="us-video-controls-minimize"></button>
-    </div>
+    </div>-->
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
-    <div class="col col-12">
-         <span class="us-video-controls-range-text">0%</span>
+    <div class="col col-12 ">
+         <span class="vc-range-text">0%</span>
     </div>
     
-    <div class="col col-12">
-        <div class="col col-11">
-            <div class="range">
-                <input type="range" min="0" max="50" value="0" id="range2" class="range-input" /> 
-            </div>
-        </div>
-        <div class="col col-1">
-            <div class="value2">0</div>
+    <div class="col col-12 vc-range-div">
+        <div class="range">
+            <input type="range" min="0" max="50" value="0" id="vc-progress" class="range-input" /> 
         </div>
     </div>
 </div>
