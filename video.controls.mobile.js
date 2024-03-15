@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.36
+// @version             0.38
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -14,16 +14,27 @@
 // @author              Fabio Lucci
 // @homepageURL         https://github.com/bigbear2
 
-// @resource     PURE_CSS   https://www.official1off.com/apps/shared/pure-min.css
 // @resource     BASE_CSS   https://unpkg.com/basscss@8.0.2/css/basscss.min.css
-// @resource     DW_JS   https://js.zapjs.com/js/download.js
-// @resource     HAMMER_JS   https://raw.githubusercontent.com/bigbear2/tampermonkey_us/master/js/hammer.js
 
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==
+
+function iifClass(element, value, trueValue, falseValue) {
+    if (value) {
+        element.removeClass(trueValue);
+        element.addClass(falseValue);
+    } else {
+        element.removeClass(falseValue);
+        element.addClass(trueValue);
+    }
+}
+
+function addListenerMulti(element, events, callback) {
+    events.split(' ').forEach(e => element.addEventListener(e, callback, false));
+}
 
 function addEventListenerAll(target, listener, ...otherArguments) {
 
@@ -171,7 +182,7 @@ document.module_video = {
         let currentTime_seconds = video.currentTime;
         let playbackRate = video.playbackRate;
         let percent = Math.ceil((video.currentTime / video.duration) * 100);
-        let text = currentTime + " / " + duration + " | " + `${percent}%` +" | Speed: " + playbackRate;
+        let text = currentTime + " / " + duration + " | " + `${percent}%` + " | Speed: " + playbackRate;
 
         let rect = video.getBoundingClientRect();
 
@@ -232,14 +243,9 @@ document.module_video = {
             window.parent.document.module_video.init_controller(video);
             return;
         }
+
         document.module_video.log("", "INIT CONTROLLER");
-
-        //document.module_video.setResource("PURE_CSS", true);
         document.module_video.setResource("BASE_CSS", true);
-        /*document.module_video.setResource("DW_JS", false);
-        document.module_video.setResource("HAMMER_JS", false);*/
-        //document.module_video.set_actual_video(video);
-
         document.module_video_controller.init(video);
     },
     get_iframe: () => {
@@ -315,10 +321,8 @@ document.module_video_controller = {
     btn_next_5: null,
     btn_next_25: null,
     btn_next_50: null,
-    progress_bar: null,
-    range_speed: null,
+    progress_pressed: null,
 
-    lbl_display_text: null,
     lbl_display_icon: null,
 
     img_play: null,
@@ -387,11 +391,11 @@ document.module_video_controller = {
         //document.module_video.actual_video.ownerDocument.location.href
         let data = document.module_video_controller.getOffset(video);
         let html = document.module_video_controller.html_controller_bootstrap();
-        html += document.module_video_controller.html_display_text(data);
         html += document.module_video_controller.html_display_icon(data);
 
         $("body").append(html);
 
+        let video_controller = document.module_video_controller;
         document.module_video_controller.btn_close = $("#us-video-controls-close");
         document.module_video_controller.btn_download = $("#us-video-controls-download");
         document.module_video_controller.btn_audio = $("#us-video-controls-audio");
@@ -404,9 +408,7 @@ document.module_video_controller = {
         document.module_video_controller.btn_next_5 = $("#us-video-controls-p5");
         document.module_video_controller.btn_next_25 = $("#us-video-controls-p25");
         document.module_video_controller.btn_next_50 = $("#us-video-controls-p50");
-        document.module_video_controller.progress_bar = $(".us-video-controls-progress");
-        //document.module_video_controller.range_speed = $("#us-video-controls-speed");
-        document.module_video_controller.lbl_display_text = $(".us-video-display-text");
+
         document.module_video_controller.lbl_display_icon = $(".us-video-display-icon");
 
         document.module_video_controller.img_play = $("#us-video-controls-img-play");
@@ -414,9 +416,9 @@ document.module_video_controller = {
         document.module_video_controller.img_fullscreen_on = $("#us-video-controls-img-on");
         document.module_video_controller.img_fullscreen_off = $("#us-video-controls-img-off");
 
+
         document.module_video_controller.get_visibility_table();
 
-        //document.module_video_controller.gesture_init();
 
         document.module_video_controller.btn_audio.on("click", (evt) => {
             if (document.module_video_controller.video.muted) {
@@ -461,117 +463,58 @@ document.module_video_controller = {
 
         });
 
-        document.module_video_controller.btn_close.on("click", (evt) => {
-            document.module_video_controller.set_visibility_controls(false);
-        });
-
-        document.module_video_controller.lbl_display_icon.on("click", (evt) => {
-            document.module_video_controller.set_visibility_controls(true);
-        });
-
-        $(".us-video-controls-seek").on("click", (evt) => {
-            document.module_video_controller.seeking(evt);
-        });
-        $(".us-video-seek").on("click", (evt) => {
-            document.module_video_controller.seeking(evt);
-        });
-        $(".us-video-speed").on("click", (evt) => {
-            let speed = evt.currentTarget.innerHTML;
-            let current_speed = document.module_video_controller.video.playbackRate;
-            switch (speed) {
-                case "-1":
-                    if (current_speed === 0.5) current_speed = 0;
-                    document.module_video_controller.video.playbackRate = current_speed - 0.5;
-                    break;
-                case "+1":
-                    if (current_speed === 0) current_speed = 1;
-                    document.module_video_controller.video.playbackRate = current_speed + 0.5;
-                    break;
-                default:
-                    document.module_video_controller.video.playbackRate = 1;
-
-            }
-            current_speed = document.module_video_controller.video.playbackRate;
-            $("#us-video-speed-text").html("S: " + current_speed.toString());
-        });
-
-        /*
-               document.module_video_controller.range_speed.on("click", (evt) => {
-                   let value = evt.currentTarget.value;
-                   console.log(value);
-                   document.module_video_controller.speed(value);
-               });
-
-               addEventListenerAll(document.module_video_controller.range_speed, (evt) => {
-                   console.log(evt.type);
-               });
 
 
-              document.module_video_controller.range_speed.on('mouseup', (event) => {
-                   let value = event.currentTarget.value;
-                   console.log("mouseup", value);
-                   document.module_video_controller.speed_control.down = false;
-               }, {passive: true});
-               document.module_video_controller.range_speed.on('mousedown', (event) => {
-                   let value = event.currentTarget.value;
-                   console.log("mousedown", value);
-                   document.module_video_controller.speed_control.down = true;
-               }, {passive: true});
-               document.module_video_controller.range_speed.on('mousemove', (event) => {
-                   let value = event.currentTarget.value;
-                   if (document.module_video_controller.speed_control.down)
-                       console.log("mousemove", value);
-               }, {passive: true});
-       */
+        video_controller.minimize = !video_controller.is_viewport_vertical;
+        if (video_controller.minimize) $(".us-video-grid").hide();
 
-        document.module_video_controller.progress_bar.on("click", (evt) => {
-            document.module_video_controller.progress(evt);
-        });
-        document.module_video_controller.btn_play.on("click", (evt) => {
-            document.module_video_controller.play();
-        });
-        document.module_video_controller.btn_fullscreen.on("click", (evt) => {
-            document.module_video_controller.fullscreen();
-        });
+        video_controller.btn_close.on("click", (evt) => video_controller.set_visibility_controls(false));
+        video_controller.lbl_display_icon.on("click", (evt) => video_controller.set_visibility_controls(true));
+        video_controller.btn_play.on("click", video_controller.play);
+        video_controller.btn_fullscreen.on("click", video_controller.fullscreen);
 
-        /*document.module_video_controller.progress_bar.on('touchstart', (event) => {
-            let elm = event.currentTarget;
-            console.log(event.type, elm);
-            document.module_video_controller.touch.x_start = event.changedTouches[0].screenX;
-            document.module_video_controller.touch.y_start = event.changedTouches[0].screenY;
+        $(".us-video-controls-seek").on("click", video_controller.seeking);
+        $(".us-video-seek").on("click", video_controller.seeking);
+        $(".us-video-speed").on("click", video_controller.speed);
+        $(".vc-range-text").on("click", video_controller.minimize);
 
-        }, {passive: true});
+        $("#us-video-controls-minimize").on("click", video_controller.minimize);
 
-        document.module_video_controller.progress_bar.on('touchend', (event) => {
-            let elm = event.currentTarget;
-            console.log(event.type, elm);
-            document.module_video_controller.touch.x_end = event.changedTouches[0].screenX;
-            document.module_video_controller.touch.y_end = event.changedTouches[0].screenY;
-            document.module_video_controller.gesture();
-        }, {passive: true});*/
 
-        /*addEventListenerAll(document.module_video_controller.progress_bar[0], (evt) => {
-            console.log(evt.type);
-        });*/
-
-        document.module_video_controller.minimize = !document.module_video_controller.is_viewport_vertical;
-        if (document.module_video_controller.minimize) $(".us-video-grid").hide();
-        $("#us-video-controls-minimize").on("click", function () {
-            document.module_video_controller.minimize = !document.module_video_controller.minimize;
-            if (document.module_video_controller.minimize) {
-                $(".us-video-grid").hide();
-            } else {
-                $(".us-video-grid").show();
-            }
-        })
-
-        document.module_video_controller.keyboard_init();
-        if (!document.module_video_controller.is_viewport_vertical) {
+        if (!video_controller.is_viewport_vertical) {
             $("#us-video-controls-panel").addClass("us-video-controls-panel-desktop");
         }
 
+        video_controller.keyboard_init();
+        video_controller.progress_init();
+    },
+    minimize: (evt) => {
+        if (document.module_video_controller.progress_pressed) return;
+        document.module_video_controller.minimize = !document.module_video_controller.minimize;
+        if (document.module_video_controller.minimize) {
+            $(".us-video-grid").hide();
+        } else {
+            $(".us-video-grid").show();
+        }
+    },
+    speed: (evt) => {
+        console.log("module_video_controller.speed");
+        let speed = evt.currentTarget.innerHTML;
+        let current_speed = document.module_video_controller.video.playbackRate;
+        switch (speed) {
+            case "-1":
+                if (current_speed === 0.5) current_speed = 0;
+                document.module_video_controller.video.playbackRate = current_speed - 0.5;
+                break;
+            case "+1":
+                if (current_speed === 0) current_speed = 1;
+                document.module_video_controller.video.playbackRate = current_speed + 0.5;
+                break;
+            default:
+                document.module_video_controller.video.playbackRate = 1;
 
-        document.module_video_controller.init_slider();
+        }
+        current_speed = document.module_video_controller.video.playbackRate;
 
     },
     seeking: (evt) => {
@@ -588,16 +531,6 @@ document.module_video_controller = {
             if (is_prev) seconds = -1 * seconds;
         }
         document.module_video_controller.video.currentTime += seconds;
-        document.module_video_controller.display_text_show()
-    },
-    progress: (evt) => {
-        let mouseX = evt.clientX;
-        let b = evt.target.getBoundingClientRect();
-        let percent = Math.ceil((mouseX / b.width) * 100);
-        let current = Math.ceil((percent / 100) * document.module_video_controller.video.duration);
-
-        document.module_video_controller.video.currentTime = current;
-        document.module_video_controller.display_text_show()
     },
     play: () => {
         console.log("module_video_controller.play");
@@ -605,10 +538,8 @@ document.module_video_controller = {
 
         if (document.module_video_controller.video_info.play) {
             document.module_video_controller.video.pause();
-            document.module_video_controller.display_text_show("PAUSE");
         } else {
             document.module_video_controller.video.play();
-            document.module_video_controller.display_text_show("PLAY");
         }
     },
     fullscreen: () => {
@@ -631,44 +562,17 @@ document.module_video_controller = {
 
         document.module_video_controller.update_controls();
     },
-    speed: (value) => {
-        console.log("module_video_controller.speed");
-        if (!document.module_video_controller.video_info.valid) return;
-
-        clearInterval(document.module_video_controller.id_speed);
-
-        let speed = parseInt(value);
-        if (speed > -1) {
-            if (speed === 0) speed = 1; else speed += 1;
-            document.module_video_controller.video.playbackRate = speed;
-            document.module_video_controller.display_text_show("SPEED X" + speed.toString());
-            document.module_video_controller.speed_x = speed;
-        } else {
-
-            document.module_video_controller.speed_x = speed;
-            document.module_video_controller.id_speed = setInterval(function () {
-                if (!document.module_video_controller.video.paused) document.module_video_controller.video.pause();
-                document.module_video_controller.video.currentTime += document.module_video_controller.speed_x;
-                document.module_video_controller.display_text_show("SPEED X" + document.module_video_controller.speed_x.toString());
-                if (document.module_video_controller.video.currentTime === 0)
-                    clearInterval(document.module_video_controller.id_speed);
-            }, 1000)
-        }
-
-
-    },
     update_timer: () => {
 
         if (!document.module_video_controller.video_info.valid) return;
-        if (document.module_video_controller.range_speed) return;
+        if (document.module_video_controller.progress_pressed) return;
 
-        $(".us-video-display-text").text(document.module_video_controller.video_info.text);
         $(".vc-range-text").html(document.module_video_controller.video_info.text);
 
         let range = document.querySelector("#vc-progress")
         let currentTime = document.module_video_controller.video.currentTime;
 
-        
+
         let progress = (currentTime / range.max) * 100;
         range.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
 
@@ -677,195 +581,62 @@ document.module_video_controller = {
         range.val(currentTime);
 
     },
-    init_slider: () => {
+    progress_init: () => {
         let range = $("#vc-progress");
         range.attr("min", 0);
         range.attr("max", document.module_video_controller.video.duration);
         range.val(document.module_video_controller.video.currentTime)
 
-        const sliderEl = document.querySelector("#vc-progress")
+        const video_progress = document.querySelector("#vc-progress")
 
-
-        sliderEl.addEventListener("input", (event) => {
+        video_progress.addEventListener("input", (event) => {
             const position = event.target.value;
-            const progress = (position / sliderEl.max) * 100;
-            sliderEl.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
-            document.module_video_controller.range_show_info();
+            const progress = (position / video_progress.max) * 100;
+            video_progress.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
+            document.module_video_controller.progress_show_info();
         })
 
-        sliderEl.addEventListener("mousedown", (event) => {
-            document.module_video_controller.range_speed = true;
-            document.module_video_controller.range_show_info();
+
+        addListenerMulti(video_progress, "mousedown touchstart", (event) => {
+            document.module_video_controller.progress_pressed = true;
+            document.module_video_controller.progress_show_info();
             $(".vc-range-text").addClass("vc-range-text-up");
         })
-        sliderEl.addEventListener("mouseup", (event) => {
-            document.module_video_controller.range_speed = false;
+
+        addListenerMulti(video_progress, "mouseup touchend", (event) => {
+            document.module_video_controller.progress_pressed = false;
             document.module_video_controller.video.currentTime = parseInt(event.target.value);
             $(".vc-range-text").removeClass("vc-range-text-up");
         })
-        sliderEl.addEventListener("touchstart", (event) => {
-            document.module_video_controller.range_speed = true;
-            document.module_video_controller.range_show_info();
-        })
-        sliderEl.addEventListener("touchend", (event) => {
-            document.module_video_controller.range_speed = false;
-            document.module_video_controller.video.currentTime = parseInt(event.target.value);
-        })
     },
-    range_show_info: () => {
+    progress_show_info: () => {
         let current_position = $("#vc-progress").val();
         let video = document.module_video_controller.video;
         let duration = document.userscript_global.secondsToHms(video.duration);
-        let duration_seconds = video.duration;
         let currentTime = document.userscript_global.secondsToHms(current_position);
-        let currentTime_seconds = current_position;
-        let playbackRate = video.playbackRate;
         let percent = Math.ceil((current_position / video.duration) * 100);
-        let text = currentTime + " / " + duration + " | " + `${percent}%` + " | Speed: " + playbackRate;
-        $(".vc-range-text").html(text);
-    },
-    update_slider: () => {
+        let text = `${currentTime} / ${duration} | ${percent}% | Speed: ${video.playbackRate}`;
 
+        $(".vc-range-text").html(text);
     },
     update_controls: () => {
         if (!document.module_video_controller.video_info.valid) return;
         if (!document.module_video_controller.init_controller) return;
 
         if (document.module_video_controller.video_info.play) {
-            document.module_video_controller.btn_play.removeClass("ff-button-next-play");
-            document.module_video_controller.btn_play.addClass("ff-button-next-pause");
             if (!document.module_video_controller.is_viewport_vertical)
                 document.module_video_controller.video.scrollIntoView();
-            /*document.module_video_controller.img_play.hide();
-            document.module_video_controller.img_pause.show();*/
-        } else {
-            document.module_video_controller.btn_play.removeClass("ff-button-next-pause");
-            document.module_video_controller.btn_play.addClass("ff-button-next-play");
-
-            /*document.module_video_controller.img_pause.hide();
-            document.module_video_controller.img_play.show();*/
         }
 
-        if (document.module_video_controller.in_fullscreen) {
-            /*document.module_video_controller.img_fullscreen_on.hide();
-            document.module_video_controller.img_fullscreen_off.show();*/
-            document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-on");
-            document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-off");
+        iifClass(document.module_video_controller.btn_play, document.module_video_controller.video_info.play, "ff-button-next-play", "ff-button-next-pause");
+        iifClass(document.module_video_controller.btn_fullscreen, document.module_video_controller.in_fullscreen, "ff-button-fullscreen-on", "ff-button-fullscreen-off");
 
-        } else {
-            /*document.module_video_controller.img_fullscreen_off.hide();
-            document.module_video_controller.img_fullscreen_on.show();*/
-            document.module_video_controller.btn_fullscreen.removeClass("ff-button-fullscreen-off");
-            document.module_video_controller.btn_fullscreen.addClass("ff-button-fullscreen-on");
-
-        }
 
         let data = document.module_video_controller.video_info.rect;
         document.module_video_controller.lbl_display_icon.css({
             "left": `${data.left + 5}px`,
             "top": `${data.top + 5}px`,
         });
-
-        /*if (document.module_video_controller.speed_x < 0 && document.module_video_controller.video_info.play)
-            document.module_video_controller.speed(1);*/
-    },
-    display_text_show: (text = null, duration = 4000) => {
-        if (!document.module_video_controller.video_info.valid) return;
-        let data = document.module_video_controller.video_info.rect;
-
-        document.module_video_controller.lbl_display_text.css({
-            "left": `${data.left + 5}px`,
-            "top": `${data.top + 5}px`,
-        });
-
-
-        if (text === null) text = document.module_video_controller.video_info.text;
-        document.module_video_controller.lbl_display_text.text(text);
-
-        if (document.module_video_controller.display.show) {
-            clearTimeout(document.module_video_controller.display.id);
-        } else {
-            document.module_video_controller.display.show = true;
-            document.module_video_controller.lbl_display_text.show(200);
-        }
-        document.module_video_controller.display.id = setTimeout(function () {
-            document.module_video_controller.lbl_display_text.hide(200);
-            document.module_video_controller.display.show = false;
-
-        }, duration);
-    },
-    gesture_init: () => {
-
-        document.module_video_controller.hammer.square = document.querySelector('.us-touch');
-        document.module_video_controller.hammer.manager = new Hammer.Manager(document.module_video_controller.hammer.square);
-        document.module_video_controller.hammer.Swipe = new Hammer.Swipe();
-        document.module_video_controller.hammer.manager.add(document.module_video_controller.hammer.Swipe);
-        document.module_video_controller.hammer.deltaX = 0;
-
-
-        document.module_video_controller.hammer.manager.on('swipe', function (e) {
-
-            document.module_video_controller.hammer.deltaX = document.module_video_controller.hammer.deltaX + e.deltaX;
-            let direction = e.offsetDirection;
-            if (direction === 4 || direction === 2) {
-                document.module_video_controller.video.currentTime +=
-                    document.module_video_controller.hammer.deltaX / 10;
-                console.debug("DELTA", document.module_video_controller.hammer.deltaX / 10, document.module_video_controller.hammer.deltaX)
-            }
-        });
-
-    },
-    gesture: () => {
-        if (!document.module_video_controller.video_info.valid) return;
-
-        let data = document.module_video_controller.touch;
-        let diff = 0;
-        let touch_diff = data.x_end;
-        let touch_type = 1;
-
-
-        if (data.x_end < data.x_start) {
-            diff = data.x_start - data.x_end;
-            touch_diff = data.x_start;
-            touch_type = -1;
-            console.log('Swiped Left', diff);
-        }
-
-        if (data.x_end > data.x_start) {
-            diff = data.x_end - data.x_start;
-            touch_diff = data.x_end;
-            touch_type = 1;
-            console.log('Swiped Right', diff);
-        }
-
-        if (data.y_end === data.y_start) {
-            diff = touch_diff;
-            touch_type = 0;
-            console.log('Tap');
-        }
-
-
-        let touchableElement = document.querySelector(".us-video-controls-progress");
-        let b = touchableElement.getBoundingClientRect();
-
-        diff = Math.ceil(diff / 2);
-        let percent = Math.ceil((diff / b.width) * 100);
-        let current = Math.ceil((percent / 100) * document.module_video_controller.video_info.duration);
-
-        switch (touch_type) {
-            case -1:
-                document.module_video_controller.video.currentTime += (current * -1);
-                break;
-            case 0:
-                //data.video.currentTime = current;
-                break;
-            case 1:
-                document.module_video_controller.video.currentTime += current;
-                break;
-        }
-
-        document.module_video_controller.display_text_show();
-
 
     },
     getOffset: (el) => {
@@ -914,7 +685,6 @@ document.module_video_controller = {
             }
 
             video.currentTime = video.currentTime + position;
-            document.module_video_controller.display_text_show(position.toString() + ' sec.');
             return;
         }
 
@@ -933,24 +703,6 @@ document.module_video_controller = {
             const code = event.which;
             document.module_video_controller.keyboard_press(key, code);
         });
-    },
-    html_display_text: (data) => {
-        return `
-<style>
-    .us-video-display-text {
-        position: fixed;
-        left: ${data.left}px;
-        top: ${data.top}px;
-        width: ${data.width}px;
-        height: 50px;
-        font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 24px;
-        text-shadow: 3px 3px 2px rgba(48, 52, 160, 1);
-        color: white;
-        z-index: 99998;
-    }
-</style>
-<div class="us-video-display-text" style="display: none;" >00:00</div>`;
     },
     html_display_icon: (data) => {
         return `
@@ -994,7 +746,8 @@ document.module_video_controller = {
         padding: 3px;
         text-decoration: none;
         transition: .2s;
-        z-index: 99999
+        z-index: 99999;
+        border-top: 1px solid darkgrey;
     }
     
     .us-video-controls-panel-desktop {
@@ -1103,14 +856,6 @@ document.module_video_controller = {
         font-weight: bold;
     }
 
-    .us-video-controls-progress {
-        position: relative;
-        background-color: dimgray;
-        border-radius: 3px;
-        width: 100%
-    }
-
- 
     #us-video-controls-minimize{
         background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
         border: 0;
@@ -1169,12 +914,14 @@ document.module_video_controller = {
     }
     
     .vc-range-text{
+        cursor: pointer;
         font-size: 10px;
         -webkit-transition: font-size 500ms;
        -moz-transition:  font-size 500ms;
         -o-transition:  font-size 500ms;
         transition:  font-size 500ms;
     }
+    
     .vc-range-text-up{
       font-size: 20px;
     }
@@ -1220,7 +967,6 @@ document.module_video_controller = {
 .range-input:focus::-webkit-slider-thumb {
   box-shadow: 0 0 0 13px rgba(255,85,0, .2)
 }
-
 .range-input::-moz-range-thumb:hover {
   box-shadow: 0 0 0 10px rgba(255,85,0, .1)
 }
@@ -1406,7 +1152,7 @@ document.module_video_controller = {
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
     <div class="col col-12 ">
-         <span class="vc-range-text">0%</span>
+         <span class="vc-range-text">00:00 / 00:00 - 0%</span>
     </div>
     
     <div class="col col-12 vc-range-div">
