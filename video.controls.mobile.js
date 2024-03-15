@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.38
+// @version             0.40
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -321,7 +321,8 @@ document.module_video_controller = {
     btn_next_5: null,
     btn_next_25: null,
     btn_next_50: null,
-    progress_pressed: null,
+    progress_pressed: false,
+    progress_thumb_mode: false,
 
     lbl_display_icon: null,
 
@@ -464,7 +465,6 @@ document.module_video_controller = {
         });
 
 
-
         video_controller.minimize = !video_controller.is_viewport_vertical;
         if (video_controller.minimize) $(".us-video-grid").hide();
 
@@ -476,9 +476,9 @@ document.module_video_controller = {
         $(".us-video-controls-seek").on("click", video_controller.seeking);
         $(".us-video-seek").on("click", video_controller.seeking);
         $(".us-video-speed").on("click", video_controller.speed);
-        $(".vc-range-text").on("click", video_controller.minimize);
+        $(".vc-range-div-text").on("click", video_controller.minimize);
 
-        $("#us-video-controls-minimize").on("click", video_controller.minimize);
+        //$("#us-video-controls-minimize").on("click", video_controller.minimize);
 
 
         if (!video_controller.is_viewport_vertical) {
@@ -582,10 +582,11 @@ document.module_video_controller = {
 
     },
     progress_init: () => {
+        const video_controller = document.module_video_controller;
         let range = $("#vc-progress");
         range.attr("min", 0);
-        range.attr("max", document.module_video_controller.video.duration);
-        range.val(document.module_video_controller.video.currentTime)
+        range.attr("max", video_controller.video.duration);
+        range.val(video_controller.video.currentTime)
 
         const video_progress = document.querySelector("#vc-progress")
 
@@ -593,20 +594,36 @@ document.module_video_controller = {
             const position = event.target.value;
             const progress = (position / video_progress.max) * 100;
             video_progress.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
-            document.module_video_controller.progress_show_info();
+            video_controller.progress_show_info();
+
+            if (video_controller.progress_thumb_mode) {
+                setTimeout(function () {
+                    video_controller.video.currentTime = position;
+                }, 1000)
+            }
         })
 
-
         addListenerMulti(video_progress, "mousedown touchstart", (event) => {
-            document.module_video_controller.progress_pressed = true;
-            document.module_video_controller.progress_show_info();
+            video_controller.progress_pressed = true;
+            video_controller.progress_show_info();
             $(".vc-range-text").addClass("vc-range-text-up");
+
+            setTimeout(function () {
+                if (!video_controller.progress_pressed) return;
+                video_controller.progress_thumb_mode = true;
+                video_controller.video.pause();
+            }, 2000)
         })
 
         addListenerMulti(video_progress, "mouseup touchend", (event) => {
-            document.module_video_controller.progress_pressed = false;
-            document.module_video_controller.video.currentTime = parseInt(event.target.value);
+            video_controller.progress_pressed = false;
+            video_controller.video.currentTime = parseInt(event.target.value);
             $(".vc-range-text").removeClass("vc-range-text-up");
+
+            if (video_controller.progress_thumb_mode && !video_controller.video_info.play) {
+                video_controller.video.play();
+            }
+            video_controller.progress_thumb_mode = false;
         })
     },
     progress_show_info: () => {
@@ -1151,7 +1168,7 @@ document.module_video_controller = {
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
-    <div class="col col-12 ">
+    <div class="col col-12 vc-range-div-text">
          <span class="vc-range-text">00:00 / 00:00 - 0%</span>
     </div>
     
