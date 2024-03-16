@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.40
+// @version             0.41
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -323,6 +323,7 @@ document.module_video_controller = {
     btn_next_50: null,
     progress_pressed: false,
     progress_thumb_mode: false,
+    progress_thumb_timer: null,
 
     lbl_display_icon: null,
 
@@ -421,50 +422,6 @@ document.module_video_controller = {
         document.module_video_controller.get_visibility_table();
 
 
-        document.module_video_controller.btn_audio.on("click", (evt) => {
-            if (document.module_video_controller.video.muted) {
-                document.module_video_controller.video.setAttribute("muted", false);
-                document.module_video_controller.video.muted = false;
-                document.module_video_controller.video.volume = 1;
-
-                document.module_video_controller.btn_audio.removeClass("ff-button-audio-off");
-                document.module_video_controller.btn_audio.addClass("ff-button-audio-on");
-            } else {
-                document.module_video_controller.video.setAttribute("muted", true);
-                document.module_video_controller.video.muted = true;
-
-                document.module_video_controller.btn_audio.removeClass("ff-button-audio-om");
-                document.module_video_controller.btn_audio.addClass("ff-button-audio-off");
-            }
-
-        });
-        document.module_video_controller.btn_download.on("click", (evt) => {
-            let src = document.module_video_controller.video.currentSrc;
-
-            if (confirm("Try new download?\n" + src)) {
-                try {
-                    download(src);
-                } catch (e) {
-                    alert(e.message);
-                }
-            } else {
-                try {
-
-                    let link = document.createElement('a');
-                    link.download = "video.mp4";
-                    link.href = src;
-                    link.click();
-                    link.remove();
-
-                } catch (e) {
-                    alert(e.message);
-                }
-            }
-            //window.open(src, "blank");
-
-        });
-
-
         video_controller.minimize = !video_controller.is_viewport_vertical;
         if (video_controller.minimize) $(".us-video-grid").hide();
 
@@ -472,13 +429,13 @@ document.module_video_controller = {
         video_controller.lbl_display_icon.on("click", (evt) => video_controller.set_visibility_controls(true));
         video_controller.btn_play.on("click", video_controller.play);
         video_controller.btn_fullscreen.on("click", video_controller.fullscreen);
+        video_controller.btn_audio.on("click", video_controller.volume);
+        video_controller.btn_download.on("click", video_controller.download);
 
         $(".us-video-controls-seek").on("click", video_controller.seeking);
         $(".us-video-seek").on("click", video_controller.seeking);
         $(".us-video-speed").on("click", video_controller.speed);
-        $(".vc-range-div-text").on("click", video_controller.minimize);
-
-        //$("#us-video-controls-minimize").on("click", video_controller.minimize);
+        $("#us-video-controls-minimize").on("click", video_controller.minimize);
 
 
         if (!video_controller.is_viewport_vertical) {
@@ -487,6 +444,47 @@ document.module_video_controller = {
 
         video_controller.keyboard_init();
         video_controller.progress_init();
+    },
+    download: (evt) => {
+        let src = document.module_video_controller.video.currentSrc;
+
+        if (confirm("Try new download?\n" + src)) {
+            try {
+                download(src);
+            } catch (e) {
+                alert(e.message);
+            }
+        } else {
+            try {
+
+                let link = document.createElement('a');
+                link.download = "video.mp4";
+                link.href = src;
+                link.click();
+                link.remove();
+
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+        //window.open(src, "blank");
+    },
+    volume: (evt) => {
+        if (document.module_video_controller.video.muted) {
+            document.module_video_controller.video.setAttribute("muted", false);
+            document.module_video_controller.video.muted = false;
+            document.module_video_controller.video.volume = 1;
+
+            document.module_video_controller.btn_audio.removeClass("ff-button-audio-off");
+            document.module_video_controller.btn_audio.addClass("ff-button-audio-on");
+        } else {
+            document.module_video_controller.video.setAttribute("muted", true);
+            document.module_video_controller.video.muted = true;
+
+            document.module_video_controller.btn_audio.removeClass("ff-button-audio-om");
+            document.module_video_controller.btn_audio.addClass("ff-button-audio-off");
+        }
+
     },
     minimize: (evt) => {
         if (document.module_video_controller.progress_pressed) return;
@@ -595,13 +593,9 @@ document.module_video_controller = {
             const progress = (position / video_progress.max) * 100;
             video_progress.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
             video_controller.progress_show_info();
-
-            if (video_controller.progress_thumb_mode) {
-                setTimeout(function () {
-                    video_controller.video.currentTime = position;
-                }, 1000)
-            }
         })
+
+        let last_position = -1;
 
         addListenerMulti(video_progress, "mousedown touchstart", (event) => {
             video_controller.progress_pressed = true;
@@ -612,10 +606,23 @@ document.module_video_controller = {
                 if (!video_controller.progress_pressed) return;
                 video_controller.progress_thumb_mode = true;
                 video_controller.video.pause();
+
+                video_controller.progress_thumb_timer = setInterval(function () {
+
+                    let position = $("#vc-progress").val();
+                    if (position === last_position) return;
+                    last_position = position;
+
+                    video_controller.video.currentTime = position;
+
+                }, 1000)
+
             }, 2000)
         })
 
         addListenerMulti(video_progress, "mouseup touchend", (event) => {
+            clearInterval(video_controller.progress_thumb_timer);
+
             video_controller.progress_pressed = false;
             video_controller.video.currentTime = parseInt(event.target.value);
             $(".vc-range-text").removeClass("vc-range-text-up");
@@ -740,7 +747,7 @@ document.module_video_controller = {
     html_controller_bootstrap: () => {
         return `
 <style>
-    #test-canvas{
+    #test-canvas {
         position: absolute;
         top: 201px;
         left: 1px;
@@ -750,6 +757,7 @@ document.module_video_controller = {
         background: #2b542c;
         display: none;
     }
+
     #us-video-controls-panel {
         background: rgb(43, 42, 50, 1);
         position: fixed;
@@ -766,12 +774,12 @@ document.module_video_controller = {
         z-index: 99999;
         border-top: 1px solid darkgrey;
     }
-    
+
     .us-video-controls-panel-desktop {
         margin-left: 15%;
         margin-right: 15%;
     }
-    
+
     .ff-button {
         background: transparent;
         border: 0;
@@ -782,7 +790,7 @@ document.module_video_controller = {
         border-radius: 3px;
         padding-top: 15px;
         padding-bottom: 26px;
-        
+
     }
 
     .ff-button:active {
@@ -791,34 +799,34 @@ document.module_video_controller = {
         border: 1px solid lightgreen;
     }
 
-    .ff-fucsia{
+    .ff-fucsia {
         border: 1px solid fuchsia;
     }
 
-    .ff-lime{
+    .ff-lime {
         border: 1px solid lightgreen;
     }
 
-    .ff-red{
+    .ff-red {
         border: 1px solid red;
     }
-    
-    .ff-blue{
+
+    .ff-blue {
         border: 1px solid dodgerblue;
     }
-    
+
     .col {
         text-align: center;
     }
 
     .ff-button-close {
         background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
-        
+
     }
 
     .ff-button-prev-50 {
         background: url("https://www.official1off.com/apps/shared/img/ff-prev-50.png") center no-repeat;
-        
+
     }
 
     .ff-button-next-50 {
@@ -860,27 +868,28 @@ document.module_video_controller = {
     .ff-button-download {
         background: url("https://www.official1off.com/apps/shared/img/ff-download.png") center no-repeat;
     }
-    
+
     .ff-button-audio-on {
         background: url("https://www.official1off.com/apps/shared/img/ff-audio-on.png") center no-repeat;
     }
-    
+
     .ff-button-audio-off {
         background: url("https://www.official1off.com/apps/shared/img/ff-audio-off.png") center no-repeat;
     }
-    .ff-button-text, .us-video-speed{
+
+    .ff-button-text, .us-video-speed {
         color: white;
         font-weight: bold;
     }
 
-    #us-video-controls-minimize{
+    #us-video-controls-minimize {
         background: url("https://www.official1off.com/apps/shared/img/ff-close.png") center no-repeat;
         border: 0;
         width: 95%;
         height: 26px;
     }
-    
-     .us-video-fullscreen-div {
+
+    .us-video-fullscreen-div {
         position: fixed;
         background: black;
         left: 0;
@@ -891,169 +900,179 @@ document.module_video_controller = {
     }
 
     .us-video-fullscreen {
-        position: fixed!important;
-        left: 0!important;
-        top: 0!important;
-        width: 100vw!important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100vw !important;
         height: 93vh;
-        z-index: 99999!important;
-        padding: 0!important;
-        margin: 0!important;
+        z-index: 99999 !important;
+        padding: 0 !important;
+        margin: 0 !important;
 
     }
+
     .us-video-fullscreen-rotate {
         transform: rotate(90deg) scale(1.3);
-        height: 80vh!important;
+        height: 80vh !important;
     }
-    
-    
+
+
     .us-video-fullscreen-rotate-new {
         background-color: #64B5F6;
-        height: 100vw!important;
-        width: 100vh!important;
+        height: 100vw !important;
+        width: 100vh !important;
         border: solid 1px black;
         border-radius: 3px;
-        transform: rotate( 90deg );
+        transform: rotate(90deg);
         /*transform-origin: left bottom;*/
         margin-top: -101vw;
         margin-left: -3vh;
     }
-    
-    
-    .us-video-grid{
-        padding-left: 4px!important;
+
+
+    .us-video-grid {
+        padding-left: 4px !important;
     }
+
     .col-1 {
-        width: 8.12333%!important;
+        width: 8.12333% !important;
     }
+
     .col-2 {
-        width: 16.22667%!important;
+        width: 16.22667% !important;
     }
-    
-    .vc-range-text{
-        padding: 2px !important;;
-        height: auto !important;;
-        color: white !important;
+
+    .vc-range-text {
+        padding-left: 10%;
         cursor: pointer;
         font-size: 10px;
         -webkit-transition: font-size 500ms;
-       -moz-transition:  font-size 500ms;
-        -o-transition:  font-size 500ms;
-        transition:  font-size 500ms;
+        -moz-transition: font-size 500ms;
+        -o-transition: font-size 500ms;
+        transition: font-size 500ms;
     }
-    
-    .vc-range-text-up{
-      font-size: 20px;
+
+    .vc-range-text-up {
+        font-size: 20px;
     }
-    
-/* range 2 */
-.range-input {
-  -webkit-appearance: none;
-  appearance: none; 
-  width: 100%;
-  cursor: pointer;
-  outline: none;
-  border-radius: 15px;
-  height: 6px;
-  background: #ccc;
-}
 
-.range-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none; 
-  height: 15px;
-  width: 15px;
-  background-color: #f50;
-  border-radius: 50%;
-  border: none;
-  transition: .2s ease-in-out;
-}
+    /* range 2 */
+    .range-input {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        cursor: pointer;
+        outline: none;
+        border-radius: 15px;
+        height: 6px;
+        background: #ccc;
+    }
 
-.range-input::-moz-range-thumb {
-  height: 15px;
-  width: 15px;
-  background-color: #f50;
-  border-radius: 50%;
-  border: none;
-  transition: .2s ease-in-out;
-}
+    .range-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 15px;
+        width: 15px;
+        background-color: #f50;
+        border-radius: 50%;
+        border: none;
+        transition: .2s ease-in-out;
+    }
 
-.range-input::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
-}
-.range-input:active::-webkit-slider-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
-.range-input:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
-.range-input::-moz-range-thumb:hover {
-  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
-}
-.range-input:active::-moz-range-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
-.range-input:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
-}
+    .range-input::-moz-range-thumb {
+        height: 15px;
+        width: 15px;
+        background-color: #f50;
+        border-radius: 50%;
+        border: none;
+        transition: .2s ease-in-out;
+    }
 
-/* range 2 */
-.range-input {
-  -webkit-appearance: none;
-  appearance: none; 
-  width: 100%;
-  cursor: pointer;
-  outline: none;
-  border-radius: 15px;
-  height: 6px;
-  background: #ccc;
-}
+    .range-input::-webkit-slider-thumb:hover {
+        box-shadow: 0 0 0 10px rgba(255, 85, 0, .1)
+    }
 
-.range-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none; 
-  height: 15px;
-  width: 15px;
-  background-color: #f50;
-  border-radius: 50%;
-  border: none;
-  transition: .2s ease-in-out;
-}
+    .range-input:active::-webkit-slider-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
 
-.range-input::-moz-range-thumb {
-  height: 15px;
-  width: 15px;
-  background-color: #f50;
-  border-radius: 50%;
-  border: none;
-  transition: .2s ease-in-out;
-}
+    .range-input:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
 
-.range-input::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
-}
-.range-input:active::-webkit-slider-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
-.range-input:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
+    .range-input::-moz-range-thumb:hover {
+        box-shadow: 0 0 0 10px rgba(255, 85, 0, .1)
+    }
 
-.range-input::-moz-range-thumb:hover {
-  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
-}
-.range-input:active::-moz-range-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
-}
-.range-input:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 13px rgba(255,85,0, .2)    
-}
+    .range-input:active::-moz-range-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
 
-.vc-range-div{
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-bottom: 10px;
-}
+    .range-input:focus::-moz-range-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
+
+    /* range 2 */
+    .range-input {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        cursor: pointer;
+        outline: none;
+        border-radius: 15px;
+        height: 6px;
+        background: #ccc;
+    }
+
+    .range-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 15px;
+        width: 15px;
+        background-color: #f50;
+        border-radius: 50%;
+        border: none;
+        transition: .2s ease-in-out;
+    }
+
+    .range-input::-moz-range-thumb {
+        height: 15px;
+        width: 15px;
+        background-color: #f50;
+        border-radius: 50%;
+        border: none;
+        transition: .2s ease-in-out;
+    }
+
+    .range-input::-webkit-slider-thumb:hover {
+        box-shadow: 0 0 0 10px rgba(255, 85, 0, .1)
+    }
+
+    .range-input:active::-webkit-slider-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
+
+    .range-input:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
+
+    .range-input::-moz-range-thumb:hover {
+        box-shadow: 0 0 0 10px rgba(255, 85, 0, .1)
+    }
+
+    .range-input:active::-moz-range-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
+
+    .range-input:focus::-moz-range-thumb {
+        box-shadow: 0 0 0 13px rgba(255, 85, 0, .2)
+    }
+
+    .vc-range-div {
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-bottom: 10px;
+    }
 
 </style>
 
@@ -1062,8 +1081,12 @@ document.module_video_controller = {
     <div class="us-video-grid">
         <div class="col col-12">
     
-            <div class="col col-2">
-                <button class="ff-button ff-button-text ff-fucsia" type="button" id="us-video-speed-text">S: 1</button>
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
+            </div>
+    
+            <div class="col col-1">
+                <button class="ff-button" type="button"></button>
             </div>
     
             <div class="col col-1">
@@ -1171,9 +1194,15 @@ document.module_video_controller = {
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
-    <div class="col col-12 vc-range-div-text">
-         <button class="ff-button vc-range-text" type="button">00:00 / 00:00 - 0%</button>
+    <div class="col col-11 vc-range-div-text">
+         <span class="vc-range-text">00:00 / 00:00 - 0%</span>
+         <!--<div class="vc-range-minimize" id="vc-range-minimize">HIDE</div>-->
     </div>
+    
+    <div class="col col-1">
+        <button class="" type="button" id="us-video-controls-minimize"></button>
+    </div>
+    
     
     <div class="col col-12 vc-range-div">
         <div class="range">
