@@ -435,7 +435,13 @@ document.module_video_controller = {
         $(".us-video-controls-seek").on("click", video_controller.seeking);
         $(".us-video-seek").on("click", video_controller.seeking);
         $(".us-video-speed").on("click", video_controller.speed);
-        $("#us-video-controls-minimize").on("click", video_controller.minimize);
+        $(".vc-range-text").on("click", video_controller.toggle);
+
+        /*addEventListenerAll(
+            document.querySelector("#us-video-controls-minimize"),
+            (evt) => { console.log(evt.type); },
+            true
+        );*/
 
 
         if (!video_controller.is_viewport_vertical) {
@@ -486,7 +492,7 @@ document.module_video_controller = {
         }
 
     },
-    minimize: (evt) => {
+    toggle: (evt) => {
         if (document.module_video_controller.progress_pressed) return;
         document.module_video_controller.minimize = !document.module_video_controller.minimize;
         if (document.module_video_controller.minimize) {
@@ -943,7 +949,7 @@ document.module_video_controller = {
     }
 
     .vc-range-text {
-        padding-left: 10%;
+        /*padding-left: 10%;*/
         cursor: pointer;
         font-size: 10px;
         -webkit-transition: font-size 500ms;
@@ -1194,14 +1200,12 @@ document.module_video_controller = {
     <!--<div class="col col-12">
         <input type="range" class="form-control-range" id="us-video-controls-speed" min="-5" max="5" style="width: 99%">
     </div>-->
-    <div class="col col-11 vc-range-div-text">
+    <div class="col col-12 vc-range-div-text">
          <span class="vc-range-text">00:00 / 00:00 - 0%</span>
          <!--<div class="vc-range-minimize" id="vc-range-minimize">HIDE</div>-->
     </div>
     
-    <div class="col col-1">
-        <button class="" type="button" id="us-video-controls-minimize"></button>
-    </div>
+ 
     
     
     <div class="col col-12 vc-range-div">
