@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.41
+// @version             0.42
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -400,6 +400,7 @@ document.module_video_controller = {
         let video_controller = document.module_video_controller;
         document.module_video_controller.btn_close = $("#us-video-controls-close");
         document.module_video_controller.btn_download = $("#us-video-controls-download");
+        document.module_video_controller.btn_download2 = $("#vc-download");
         document.module_video_controller.btn_audio = $("#us-video-controls-audio");
 
         document.module_video_controller.btn_prev_5 = $("#us-video-controls-m5");
@@ -431,6 +432,7 @@ document.module_video_controller = {
         video_controller.btn_fullscreen.on("click", video_controller.fullscreen);
         video_controller.btn_audio.on("click", video_controller.volume);
         video_controller.btn_download.on("click", video_controller.download);
+        video_controller.btn_download2.on("click", video_controller.externalVideoPlayer);
 
         $(".us-video-controls-seek").on("click", video_controller.seeking);
         $(".us-video-seek").on("click", video_controller.seeking);
@@ -450,6 +452,22 @@ document.module_video_controller = {
 
         video_controller.keyboard_init();
         video_controller.progress_init();
+    },
+    externalVideoPlayer: (evt) => {
+        let src = document.module_video_controller.video.currentSrc;
+        console.log("externalVideoPlayer", src);
+        let url = "https://www.official1off.com/apps/shared/php/video.player.php?url=" + encodeURIComponent(src);
+        try {
+
+            let link = document.createElement('a');
+            link.target = "_blank";
+            link.href = url;
+            link.click();
+            link.remove();
+
+        } catch (e) {
+            alert(e.message);
+        }
     },
     download: (evt) => {
         let src = document.module_video_controller.video.currentSrc;
@@ -1096,7 +1114,7 @@ document.module_video_controller = {
             </div>
     
             <div class="col col-1">
-                <button class="ff-button" type="button"></button>
+                <button class="ff-button ff-button-download ff-blue" type="button" id="vc-download"></button>
             </div>
     
     
