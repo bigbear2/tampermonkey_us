@@ -67,18 +67,22 @@ $source = "<source src='{$url}' type='video/{$type}'>"
                 <div class="col-1"></div>
                 <div class="col-1"></div>
                 <div class="col-1">
-                    <button type="button" class="btn btn-outline-primary vp-skip" data-value="5"><i
+                    <button type="button" class="btn btn-primary vp-skip" data-value="5"><i
                                 class="bi bi-fast-forward"></i></button>
                 </div>
                 <div class="col-1">
-                    <button type="button" class="btn btn-outline-primary vp-skip" data-value="25"><i
+                    <button type="button" class="btn btn-primary vp-skip" data-value="25"><i
                                 class="bi bi-fast-forward-fill"></i></button>
                 </div>
                 <div class="col-1">
-                    <button type="button" class="btn btn-outline-primary vp-skip" data-value="60"><i
+                    <button type="button" class="btn btn-primary vp-skip" data-value="60"><i
                                 class="bi bi-skip-forward-fill"></i></button>
                 </div>
             </div>
+            <div class="row" style="padding: 5px">
+                <input type="range" class="form-range" min="0" max="100" step="1" value="0" id="vp-progress">
+            </div>
+            <div class="row" style="padding: 5px"><?= $url ?></div>
         </div>
     </div>
 </div>
@@ -125,25 +129,36 @@ $source = "<source src='{$url}' type='video/{$type}'>"
 
 
     const video_player = {
+        controls_visible: true,
+        controls: $("#video-controls"),
+        hook: false,
         element: $$$("#video-player"),
         player: ($$$("#video-player")),
+        progress: ($$$("#vp-progress")),
         isPlaying: false,
-
         init: () => {
             video_player.video_events_init();
 
             $("#vp-play").on("click", video_player.play);
             $(".vp-skip").on("click", video_player.skip);
 
+            const _video = $("video");
+            const _video_body = $("#video-player-body");
 
-            $("#video-player-body").on('click', function () {
-                $("#video-controls").toggle(500);
+            _video_body.on('click', (evt) => video_player.toggleVisibleControls(evt));
+            _video.on('click', (evt) => video_player.toggleVisibleControls(evt));
+
+            _video.on("dblclick", (evt) => {
+                video_player.play(evt)
             });
 
-            $("video").on('click', function () {
-                $("#video-controls").toggle(500);
-            });
-
+        },
+        isVisibleControls: () => {
+            let zIndex = video_player.player.style.zIndex;
+            return (zIndex === "-1");
+        },
+        toggleVisibleControls: (evt) => {
+            video_player.set_controls_visible(true);
         },
         play: (evt) => {
             let button = document.querySelector("#vp-play");
@@ -154,7 +169,7 @@ $source = "<source src='{$url}' type='video/{$type}'>"
             } else {
                 button.innerHTML = '<i class="bi bi-pause-fill"></i>';
                 video_player.player.play();
-                $("#video-controls").hide(500);
+                video_player.set_controls_visible(false);
             }
 
         },
@@ -163,6 +178,19 @@ $source = "<source src='{$url}' type='video/{$type}'>"
             let value = $(elm).attr("data-value");
             console.debug("skip", value);
             video_player.player.currentTime += parseInt(value);
+        },
+        set_controls_visible: (value) => {
+            if (video_player.controls_visible === value) return;
+            video_player.controls_visible = value;
+            if (value) {
+                video_player.player.style.zIndex = "-1";
+                $("#video-controls").show(500);
+            } else {
+                $("#video-controls").hide(500, () => {
+                    video_player.player.style.zIndex = "1";
+                });
+
+            }
         },
         parse_event: (event) => {
             let video = event.target;
@@ -200,6 +228,8 @@ $source = "<source src='{$url}' type='video/{$type}'>"
                     document.module_video.set_actual_video(video);*/
                     break;
                 case "timeupdate":
+                    $(video_player.progress).attr("max", video.duration);
+                    $(video_player.progress).val(video.currentTime);
                     /*document.module_video.get_video_info();
                     document.module_video.set_video_info();*/
                     break;

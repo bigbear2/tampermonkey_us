@@ -456,6 +456,12 @@ document.module_video_controller = {
     externalVideoPlayer: (evt) => {
         let src = document.module_video_controller.video.currentSrc;
         console.log("externalVideoPlayer", src);
+
+        let blob = src.slice(0, 4);
+        if (blob === "blob") {
+            if (!confirm("The url contain blob protocol. Continue?\n" + src)) return
+        }
+
         let url = "https://www.official1off.com/apps/shared/php/video.player.php?url=" + encodeURIComponent(src);
         try {
 
@@ -471,6 +477,11 @@ document.module_video_controller = {
     },
     download: (evt) => {
         let src = document.module_video_controller.video.currentSrc;
+
+        let blob = src.slice(0, 4);
+        if (blob === "blob") {
+            if (!confirm("The url contain blob protocol. Continue?\n" + src)) return
+        }
 
         if (confirm("Try new download?\n" + src)) {
             try {
