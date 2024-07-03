@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.42
+// @version             0.43
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -452,6 +452,9 @@ document.module_video_controller = {
 
         video_controller.keyboard_init();
         video_controller.progress_init();
+
+        document.module_video_controller.video.muted = false;
+        document.module_video_controller.video.volume = 1;
     },
     externalVideoPlayer: (evt) => {
         let src = document.module_video_controller.video.currentSrc;
