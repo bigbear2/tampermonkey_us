@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.43
+// @version             0.44
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -141,6 +141,7 @@ document.module_video = {
             case "play":
                 document.module_video.video_info.play = true;
                 document.module_video.set_actual_video(video);
+                document.module_video.setAutovolume(video);
                 /* $("#test-canvas").show();
                  video.addEventListener('play', function () {
                      let $this = this; //cache
@@ -254,6 +255,14 @@ document.module_video = {
             href: window.location.href,
             elm: null
         };
+    },
+    setAutovolume: (video) => {
+       
+        if (video.muted || video.volume === 0){
+            video.setAttribute("muted", false);
+            video.muted = false;
+            video.volume = 1;
+        }
     }
 }
 
