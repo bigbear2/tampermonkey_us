@@ -14,6 +14,8 @@
 // @match        https://www.eporner.com/*
 // @match        https://www.xvideos.com/*
 // @match        https://spankbang.com/*
+// @match        https://www.fuq.com/*
+// @match        https://www.analgalore.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lovenselife.com
 // @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require  https://cdn.jsdelivr.net/npm/toastify-js
@@ -60,6 +62,13 @@ function infoLog(...args) {
     [].push.call(args, '📘 INFO');
     console.debug(args);
 
+}
+
+function evalTwo(value) {
+    var script = document.createElement("script");
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("src", "url to the script file here");
+    document.getElementsByTagName("head")[0].appendChild(script);
 }
 
 document.mobileAndTabletCheck = function () {
@@ -455,6 +464,50 @@ function xnxxColorizeTime() {
 
 }
 
+function fuqColorizeTime() {
+    debugLog("fuqColorizeTime");
+    const collection = document.querySelectorAll(".duration-300 > span");
+
+
+    for (let i = 0; i < collection.length; i++) {
+        try {
+            let elm = collection[i];
+            elm = elm.parentNode.parentNode.querySelector(".grid-flow-col");
+
+            let text = elm.innerText;
+
+            text = text.replace("HD", "");
+            text = text.replace("VR", "");
+            text = text.trim();
+
+            let time = timeToSeconds(text);
+            let t_time = typeTime(text, true);
+ 
+            let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
+            let record = {
+                "element": item,
+                "seconds": time * 60,
+                "time": time,
+            }
+            item.classList.add("us-watched-min-" + t_time.toString());
+            element_video.push(record);
+
+            if (elm.style.fontSize === "20px") continue;
+
+            elm.style.color = time_colors[t_time];
+            item.classList.add("us-watched-min-" + t_time.toString());
+            elm.style.fontSize = "20px";
+
+            console.log(time)
+
+        } catch (error) {
+            console.log(error.message)
+        }
+
+    }
+
+
+}
 
 function xHamsterColorizeTime() {
 
@@ -557,6 +610,8 @@ function durationColorizeTime() {
 
         let time = collection[i].innerText;
         time = time.replace("1080p", "").replace("720p", "").trim();
+        time = time.replace("HD", "");
+        time = time.trim();
 
         if (time.indexOf(":") == -1) continue;
 
@@ -618,6 +673,8 @@ document.us_vtc = {
     is_xhamster: (window.location.host.indexOf('xhamster.') > -1),
     is_eporner: (window.location.host.indexOf('.eporner.com') > -1),
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
+    is_fuq: (window.location.host.indexOf('fuq.com') > -1),
+    is_analgalore: (window.location.host.indexOf('analgalore.com') > -1),
     fnColorizeTime: null,
     is_change_filter: true,
     on_apply_filter: false,
@@ -641,8 +698,11 @@ document.us_vtc = {
         if (document.us_vtc.is_eporner) document.us_vtc.fnColorizeTime = epornerColorizeTime;
         if (document.us_vtc.is_xnxx) document.us_vtc.fnColorizeTime = xnxxColorizeTime;
         if (document.us_vtc.is_xhamster) document.us_vtc.fnColorizeTime = xHamsterColorizeTime;
-        if (document.us_vtc.is_pornhub || document.us_vtc.is_redtube) document.us_vtc.fnColorizeTime = durationColorizeTime;
+        if (document.us_vtc.is_pornhub) document.us_vtc.fnColorizeTime = durationColorizeTime;
+        if (document.us_vtc.is_fuq || document.us_vtc.is_analgalore) document.us_vtc.fnColorizeTime = fuqColorizeTime;
         //if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
+
+        if (document.us_vtc.fnColorizeTime === null) return;
 
         if (window.location.href.indexOf('xvideos.com/video') > -1) {
             me.video_container = document.querySelector("#content");
@@ -1176,7 +1236,7 @@ document.pagevisited = {
     bookmarks: [],
     remote_js: "",
     remote_css: "",
-
+    notify_ready:false,
     init: function () {
         if (document.pagevisited.is_init) return;
         document.pagevisited.is_init = true
@@ -1233,17 +1293,23 @@ document.pagevisited = {
                 font-size: 15px;
             }
         `;
- 
+
         GM_addStyle(css);
 
         document.pagevisited.remote_css = GM_getResourceText("REMOTE_CSS");
         GM_addStyle(document.pagevisited.remote_css);
         //debug(document.pagevisited.remote_css);
 
-        document.pagevisited.remote_js = GM_getResourceText("REMOTE_JS");
-        eval(document.pagevisited.remote_js);
+  
         //debug(document.pagevisited.remote_js);
+        try {
+            document.pagevisited.remote_js = GM_getResourceText("REMOTE_JS");
+            eval(document.pagevisited.remote_js);
+            document.pagevisited.notify_ready = true;
 
+        } catch (error) {
+            errorLog('pageVisited', 'ERRORE', error.message);
+        }
         document.pagevisited.bookmarks = GM_getValue("pageVisited", "[]");
         document.pagevisited.bookmarks = JSON.parse(document.pagevisited.bookmarks);
         infoLog(document.pagevisited.bookmarks);
@@ -1254,6 +1320,7 @@ document.pagevisited = {
 
     },
     notify: function (message, error = true, added = false) {
+        if (!document.pagevisited.notify_ready) return;
         let added_duration = (!added) ? 5000 : 10000;
         Toastify({
             text: message,
