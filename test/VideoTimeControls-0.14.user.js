@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.14
+// @version      0.15
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        https://*xhamster.com/*
