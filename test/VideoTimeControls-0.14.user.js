@@ -393,7 +393,7 @@ function xvideosColorizeTime() {
             element_video.push(record);
 
             if (item.innerHTML.indexOf("pv-visited") > -1) {
-
+                if (item.tagName === "BODY") continue;
                 if (item.classList.contains("us-watched")) continue;
                 item.style.opacity = 0.5;
                 item.classList.add("us-watched");
