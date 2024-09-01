@@ -1,21 +1,13 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.15
+// @version      0.19
 // @description  VideoTimeControls
 // @author       bigbear2sfc
-// @match        https://*xhamster.com/*
-// @match        https://www.xnxx.com/*
-// @match        https://*pornhub.com/*
-// @match        https://*redtube.com/*
-// @match        https://*eporner.com/*
-// @match        https://www.pornhub.com/*
-// @match        https://www.redtube.com/*
-// @match        https://www.eporner.com/*
-// @match        https://www.xvideos.com/*
-// @match        https://spankbang.com/*
-// @match        https://www.fuq.com/*
-// @match        https://www.analgalore.com/*
+// @match        http://*
+// @match        https://*
+// @include      http://*
+// @include      https://*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lovenselife.com
 // @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require  https://cdn.jsdelivr.net/npm/toastify-js
@@ -248,14 +240,24 @@ function spankbangColorizeTime() {
             let elm = collection[i];
             let text = elm.innerText;
 
+
+            if (text.indexOf("HD") > -1) continue;
+
+            if (text.indexOf("m") == -1) {
+                if (text.indexOf("s") == -1) continue;
+            }
+
+
             text = text.replace("m", "");
             text = text.replace("s", "");
 
-            let t_time = typeTime(text, true);
-            let time = timeToSeconds(text);
+            text = parseInt(text) ;
+            let t_time = typeTime(text, false);
+            let time = text * 60;
 
+            console.debug(text, t_time, time);
 
-            let item = elm.parentNode.parentNode.parentNode;
+            let item = elm.parentNode.parentNode;
             let record = {
                 "element": item,
                 "seconds": time,
@@ -279,6 +281,43 @@ function spankbangColorizeTime() {
 
 }
 
+function hentaicityColorizeTime() {
+    debugLog("hentaicityColorizeTime");
+    const collection = document.querySelectorAll(".time");
+    for (let i = 0; i < collection.length; i++) {
+        try {
+            let elm = collection[i];
+            let text = elm.innerText;
+
+
+
+            let t_time = typeTime(text, true);
+            let time = timeToSeconds(text);
+
+
+            let item = elm.parentNode.parentNode.parentNode;
+            let record = {
+                "element": item,
+                "seconds": time,
+                "time": text,
+            }
+            item.classList.add("us-watched-min-" + t_time.toString());
+            element_video.push(record);
+
+            if (elm.style.fontSize === "20px") continue;
+
+            elm.style.fontSize = "20px";
+            elm.style.color = time_colors[t_time];
+
+
+        } catch (error) {
+            errorLog("hentaicityColorizeTime", error);
+        }
+
+    }
+
+
+}
 
 function epornerColorizeTime() {
     debugLog("epornerColorizeTime");
@@ -482,7 +521,7 @@ function fuqColorizeTime() {
 
             let time = timeToSeconds(text);
             let t_time = typeTime(text, true);
- 
+
             let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
             let record = {
                 "element": item,
@@ -675,6 +714,7 @@ document.us_vtc = {
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
     is_fuq: (window.location.host.indexOf('fuq.com') > -1),
     is_analgalore: (window.location.host.indexOf('analgalore.com') > -1),
+    is_hentaicity: (window.location.host.indexOf('hentaicity.com') > -1),
     fnColorizeTime: null,
     is_change_filter: true,
     on_apply_filter: false,
@@ -697,10 +737,11 @@ document.us_vtc = {
         if (document.us_vtc.is_redtube) document.us_vtc.fnColorizeTime = redtubeColorizeTime;
         if (document.us_vtc.is_eporner) document.us_vtc.fnColorizeTime = epornerColorizeTime;
         if (document.us_vtc.is_xnxx) document.us_vtc.fnColorizeTime = xnxxColorizeTime;
+        if (document.us_vtc.is_hentaicity) document.us_vtc.fnColorizeTime = hentaicityColorizeTime;
         if (document.us_vtc.is_xhamster) document.us_vtc.fnColorizeTime = xHamsterColorizeTime;
         if (document.us_vtc.is_pornhub) document.us_vtc.fnColorizeTime = durationColorizeTime;
         if (document.us_vtc.is_fuq || document.us_vtc.is_analgalore) document.us_vtc.fnColorizeTime = fuqColorizeTime;
-        //if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
+        if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
 
         if (document.us_vtc.fnColorizeTime === null) return;
 
@@ -713,6 +754,7 @@ document.us_vtc = {
 
 
         if (document.us_vtc.is_xhamster) document.us_vtc.enlargeContains();
+        debugLog("STAR COLORIZE");
         document.us_vtc.fnColorizeTime();
 
 
@@ -1236,7 +1278,7 @@ document.pagevisited = {
     bookmarks: [],
     remote_js: "",
     remote_css: "",
-    notify_ready:false,
+    notify_ready: false,
     init: function () {
         if (document.pagevisited.is_init) return;
         document.pagevisited.is_init = true
@@ -1300,7 +1342,7 @@ document.pagevisited = {
         GM_addStyle(document.pagevisited.remote_css);
         //debug(document.pagevisited.remote_css);
 
-  
+
         //debug(document.pagevisited.remote_js);
         try {
             document.pagevisited.remote_js = GM_getResourceText("REMOTE_JS");
@@ -1319,12 +1361,12 @@ document.pagevisited = {
 
 
     },
-    notify: function (message, error = true, added = false) {
+    notify: function (message, _duration = 10000, error = true) {
         if (!document.pagevisited.notify_ready) return;
-        let added_duration = (!added) ? 5000 : 10000;
+
         Toastify({
             text: message,
-            duration: 10000,
+            duration: _duration,
             close: true,
             className: (error) ? "toast-error" : "toast-info",
             gravity: "top", // `top` or `bottom`
@@ -1392,6 +1434,7 @@ document.pagevisited = {
             document.pagevisited.bookmarks.push(elm);
             debugLog('pageVisited', 'AGGIUNTO');
             document.pagevisited.added_href = true;
+            document.pagevisited.notify('AGGIUNTO', 5000, false);
         }
         let json = JSON.stringify(document.pagevisited.bookmarks);
         GM_setValue("pageVisited", json)
@@ -1424,7 +1467,16 @@ document.pagevisited = {
                 //debug("ELEMENT VISITED", element.href, view);
 
             })
-            document.pagevisited.tooltips();
+
+
+            try {
+                document.pagevisited.tooltips();
+
+            } catch (error) {
+                errorLog('pageVisited', 'tooltips', error.message);
+            }
+
+
         }, 1000);
     },
     italianTimeFormat: function (dateUTC) {
@@ -1466,7 +1518,12 @@ document.pagevisited = {
 
             };
             a[x].onmouseout = function () {
-                document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
+                try {
+                    document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
+                } catch (error) {
+            
+                }
+                
             };
         }
     },
@@ -1491,7 +1548,11 @@ document.pagevisited = {
 
         };
         elm.onmouseout = function () {
-            document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
+            try {
+                document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
+            } catch (error) {
+        
+            }
         };
 
     }
