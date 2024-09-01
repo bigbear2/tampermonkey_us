@@ -2,7 +2,7 @@
 
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.44
+// @version             0.45
 
 // @namespace           io.bigbear2.video.mobile
 // @include             *
@@ -257,8 +257,8 @@ document.module_video = {
         };
     },
     setAutovolume: (video) => {
-       
-        if (video.muted || video.volume === 0){
+
+        if (video.muted || video.volume === 0) {
             video.setAttribute("muted", false);
             video.muted = false;
             video.volume = 1;
@@ -593,19 +593,33 @@ document.module_video_controller = {
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
         if (document.module_video_controller.in_fullscreen) {
-            $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
-            $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
-            if (document.module_video_controller.is_viewport_vertical)
-                $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate-new");
+            if (!document.module_video.semiFullScreen()) {
+                $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
+                $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
+                if (document.module_video_controller.is_viewport_vertical)
+                    $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen-rotate-new");
+            }
+
         } else {
-            $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
-            $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
-            if (document.module_video_controller.is_viewport_vertical)
-                $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen-rotate-new");
+            if (!document.module_video.semiFullScreen()) {
+                $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
+                $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
+                if (document.module_video_controller.is_viewport_vertical)
+                    $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen-rotate-new");
+            }
 
         }
 
         document.module_video_controller.update_controls();
+    },
+    semiFullScreen: () => {
+        console.debug("semiFullScreen", user_player.fullscreen);
+        if (user_player.fullscreen == null) {
+            user_player.fullscreen = document.querySelector("#playerControlBtn");
+            if (user_player.fullscreen == null) return false;
+        }
+        user_player.fullscreen.click();
+        return true;
     },
     update_timer: () => {
 
@@ -730,7 +744,7 @@ document.module_video_controller = {
             let part_slow = video.duration / 25;
             switch (code) {
                 case 187:
-                case 105 : //9
+                case 105: //9
                     position = part_slow;
                     break;
                 case 186:
