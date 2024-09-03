@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.47
+// @version             0.48
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 // @supportURL          https://github.com/ni554n/userscripts/issues
@@ -622,12 +622,10 @@ document.module_video_controller = {
         document.module_video_controller.update_controls();
     },
     semiFullScreen: () => {
-        console.debug("semiFullScreen", user_player.fullscreen);
-        if (user_player.fullscreen == null) {
-            user_player.fullscreen = document.querySelector("#playerControlBtn");
-            if (user_player.fullscreen == null) return false;
-        }
-        user_player.fullscreen.click();
+        console.debug("semiFullScreen");
+        let btn = document.querySelector("#playerControlBtn");
+        if (btn == null) return false;
+        btn.click();
         return true;
     },
     update_timer: () => {
