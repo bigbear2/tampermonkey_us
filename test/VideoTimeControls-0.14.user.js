@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.19
+// @version      0.21
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -251,7 +251,7 @@ function spankbangColorizeTime() {
             text = text.replace("m", "");
             text = text.replace("s", "");
 
-            text = parseInt(text) ;
+            text = parseInt(text);
             let t_time = typeTime(text, false);
             let time = text * 60;
 
@@ -705,6 +705,8 @@ function startColorizeTime(l) {
 }
 
 document.us_vtc = {
+    zoom_14: ['4kporn.xxx', 'fapnfuck.com', 'b1gtits.com'],
+    zoom_12: ['www.analgalore.com', 'www.fuq.com', 'www.fucd.com'],
     is_xvideos: (window.location.host.indexOf('xvideos.com') > -1),
     is_redtube: (window.location.host == 'www.redtube.com'),
     is_xnxx: (window.location.host == 'www.xnxx.com'),
@@ -743,6 +745,13 @@ document.us_vtc = {
         if (document.us_vtc.is_fuq || document.us_vtc.is_analgalore) document.us_vtc.fnColorizeTime = fuqColorizeTime;
         if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
 
+        let host = window.location.host;
+        let body = document.querySelector("body");
+        if (!document.mobileAndTabletCheck()) {
+            if (me.zoom_14.includes(host)) body.style.zoom = "1.4";
+            if (me.zoom_12.includes(host)) body.style.zoom = "1.2";
+        }
+
         if (document.us_vtc.fnColorizeTime === null) return;
 
         if (window.location.href.indexOf('xvideos.com/video') > -1) {
@@ -770,7 +779,6 @@ document.us_vtc = {
             document.us_vtc.enlargeVideoPlayer();
         }, 2000)
         //}
-
 
 
         setInterval(function () {
@@ -931,14 +939,19 @@ document.us_vtc = {
                 "filter_watched_elm": true,
             };
         }
-        value = JSON.parse(value);
-        debugLog("loadFilter:", value);
+        try {
+            value = JSON.parse(value);
+            debugLog("loadFilter:", value);
 
-        document.us_vtc.filter_duration_elm_1.checked = value.filter_duration_elm_1;
-        document.us_vtc.filter_duration_elm_2.checked = value.filter_duration_elm_2;
-        document.us_vtc.filter_duration_elm_3.checked = value.filter_duration_elm_3;
-        document.us_vtc.filter_duration_elm_4.checked = value.filter_duration_elm_4;
-        document.us_vtc.filter_watched_elm.checked = value.filter_watched_elm;
+            document.us_vtc.filter_duration_elm_1.checked = value.filter_duration_elm_1;
+            document.us_vtc.filter_duration_elm_2.checked = value.filter_duration_elm_2;
+            document.us_vtc.filter_duration_elm_3.checked = value.filter_duration_elm_3;
+            document.us_vtc.filter_duration_elm_4.checked = value.filter_duration_elm_4;
+            document.us_vtc.filter_watched_elm.checked = value.filter_watched_elm;
+        } catch (error) {
+
+        }
+
 
     },
     applyFilter: () => {
@@ -1354,7 +1367,7 @@ document.pagevisited = {
         }
         document.pagevisited.bookmarks = GM_getValue("pageVisited", "[]");
         document.pagevisited.bookmarks = JSON.parse(document.pagevisited.bookmarks);
-        infoLog(document.pagevisited.bookmarks);
+        //infoLog(document.pagevisited.bookmarks);
 
         let obj_css = `<div id="pv-footer" class="pv-footer-hide" onclick='this.remove()' style='cursor: pointer;'>VISITED</div>`;
         document.body.insertAdjacentHTML("beforeend", obj_css);
@@ -1393,8 +1406,6 @@ document.pagevisited = {
         let adesso = Date.now();
         adesso = document.pagevisited.italianTimeFormat(adesso);
 
-        debugLog("added_href", document.pagevisited.added_href);
-        debugLog("update", document.pagevisited.update);
 
         let min = 10 * 60000;
         setTimeout(function () { document.pagevisited.update = false; }, min);
@@ -1460,8 +1471,6 @@ document.pagevisited = {
                         element.setAttribute("title", hint);
                         element.setAttribute("tooltip", hint);
                         element.classList.add("pv-visited");
-                        debugLog(element.href, hint);
-
                     }
                 }
                 //debug("ELEMENT VISITED", element.href, view);
@@ -1471,7 +1480,6 @@ document.pagevisited = {
 
             try {
                 document.pagevisited.tooltips();
-
             } catch (error) {
                 errorLog('pageVisited', 'tooltips', error.message);
             }
@@ -1495,7 +1503,7 @@ document.pagevisited = {
         return null
     },
     tooltips: function () {
-        debugLog("tooltips");
+
 
         var a = document.getElementsByTagName('*'),
             tip, text,
@@ -1521,9 +1529,9 @@ document.pagevisited = {
                 try {
                     document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
                 } catch (error) {
-            
+
                 }
-                
+
             };
         }
     },
@@ -1551,7 +1559,7 @@ document.pagevisited = {
             try {
                 document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
             } catch (error) {
-        
+
             }
         };
 
