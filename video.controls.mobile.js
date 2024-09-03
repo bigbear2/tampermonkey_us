@@ -1,21 +1,16 @@
 // ==UserScript==
-
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.46
-
+// @version             0.47
 // @namespace           io.bigbear2.video.mobile
 // @include             *
-
 // @supportURL          https://github.com/ni554n/userscripts/issues
 // @license             MIT
 // @icon                https://www.official1off.com/apps/shared/img/ff-setting.png
 // @require             http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @author              Fabio Lucci
 // @homepageURL         https://github.com/bigbear2
-
 // @resource     BASE_CSS   https://unpkg.com/basscss@8.0.2/css/basscss.min.css
-
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_getResourceText
@@ -601,7 +596,7 @@ document.module_video_controller = {
 
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
         if (document.module_video_controller.in_fullscreen) {
-            if (!document.module_video.semiFullScreen()) {
+            if (!document.module_video_controller.semiFullScreen()) {
 
                 if (document.mobileAndTabletCheck() ){
                     document.module_video_controller.video.requestFullscreen();
@@ -615,7 +610,7 @@ document.module_video_controller = {
             }
 
         } else {
-            if (!document.module_video.semiFullScreen()) {
+            if (!document.module_video_controller.semiFullScreen()) {
                 $("#ff-div-fullscreen").removeClass("us-video-fullscreen-div");
                 $(document.module_video_controller.video.parentNode).removeClass("us-video-fullscreen");
                 if (document.module_video_controller.is_viewport_vertical)
