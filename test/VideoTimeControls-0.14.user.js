@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.21
+// @version      0.22
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -893,6 +893,7 @@ document.us_vtc = {
                     <button type="button" value="7" class="us_vtc_filter">Search Tags</button>
                     <button type="button" value="8" class="us_vtc_filter">NOISE</button>
                     <button type="button" value="9" class="us_vtc_filter">Colorize</button>
+                    <button type="button" value="10" class="us_vtc_filter">Close</button>
                 </form>
             </div>`;
 
@@ -924,7 +925,7 @@ document.us_vtc = {
 
         GM_setValue('us_xht', JSON.stringify(data));
 
-        debugLog("saveFilter:", data);
+        //debugLog("saveFilter:", data);
         document.us_vtc.is_change_filter = true;
     },
     loadFilter: () => {
@@ -941,7 +942,7 @@ document.us_vtc = {
         }
         try {
             value = JSON.parse(value);
-            debugLog("loadFilter:", value);
+            //debugLog("loadFilter:", value);
 
             document.us_vtc.filter_duration_elm_1.checked = value.filter_duration_elm_1;
             document.us_vtc.filter_duration_elm_2.checked = value.filter_duration_elm_2;
@@ -995,6 +996,10 @@ document.us_vtc = {
                 break;
             case "9":
                 document.us_vtc.fnColorizeTime();
+                break;
+            case "10":
+                let elm = document.querySelector("#us_vtc_filter");
+                elm.remove();
                 break;
             default:
                 document.us_vtc.viewVideosDuration(value, checked);
