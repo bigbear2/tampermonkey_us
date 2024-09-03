@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.48
+// @version             0.49
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 // @supportURL          https://github.com/ni554n/userscripts/issues
@@ -594,14 +594,14 @@ document.module_video_controller = {
         console.log("module_video_controller.fullscreen");
         if (!document.module_video_controller.video_info.valid) return;
 
+        if (document.mobileAndTabletCheck() ){
+            document.module_video_controller.video.requestFullscreen();
+            return;
+        }
+
         document.module_video_controller.in_fullscreen = !document.module_video_controller.in_fullscreen;
         if (document.module_video_controller.in_fullscreen) {
             if (!document.module_video_controller.semiFullScreen()) {
-
-                if (document.mobileAndTabletCheck() ){
-                    document.module_video_controller.video.requestFullscreen();
-                    return;
-                }
 
                 $("#ff-div-fullscreen").addClass("us-video-fullscreen-div");
                 $(document.module_video_controller.video.parentNode).addClass("us-video-fullscreen");
