@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.49
+// @version             0.51
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 // @supportURL          https://github.com/ni554n/userscripts/issues
@@ -141,6 +141,7 @@ document.module_video = {
                 break;
             case "playing":
                 break;
+
             case "play":
                 document.module_video.video_info.play = true;
                 document.module_video.set_actual_video(video);
@@ -235,6 +236,16 @@ document.module_video = {
             document.module_video_controller.video_info = document.module_video.video_info;
             document.module_video_controller.update_controls();
         }
+
+        if (!document.mobileAndTabletCheck()) return;
+        
+        document.addEventListener("fullscreenchange", function () {
+            if (document.fullscreenElement) {
+                document.module_video.actual_video.setAttribute("controls", true);
+                return;
+            }
+            document.module_video.actual_video.removeAttribute("controls");
+        });
 
     },
     init_controller: (video) => {
@@ -594,8 +605,8 @@ document.module_video_controller = {
         console.log("module_video_controller.fullscreen");
         if (!document.module_video_controller.video_info.valid) return;
 
-        if (document.mobileAndTabletCheck() ){
-            document.module_video_controller.video.requestFullscreen();
+        if (document.mobileAndTabletCheck()) {
+            document.module_video_controller.mobileFullScreen();
             return;
         }
 
@@ -620,6 +631,15 @@ document.module_video_controller = {
         }
 
         document.module_video_controller.update_controls();
+    },
+    mobileFullScreen: () => {
+        //https://webdesign.tutsplus.com/fullscreen-button-with-javascript--cms-107168t
+        let video = document.module_video_controller.video;        
+        if (video.webkitSupportsFullscreen) {
+            video.webkitEnterFullscreen();
+            return;
+        }
+        video.requestFullscreen();
     },
     semiFullScreen: () => {
         console.debug("semiFullScreen");
