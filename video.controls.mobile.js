@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.52
+// @version             0.53
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 // @supportURL          https://github.com/ni554n/userscripts/issues
@@ -183,33 +183,44 @@ document.module_video = {
         console.debug("ADD TOUCH EVENT");
 
         elm.addEventListener("touchstart", () => {
-            console.debug("VIDEO TOUCH DOWN");
-            if (elm.playbackRate == CSP) return;
-            elm.playbackRate = CSP;
-            toast("SPEED: " + CSP.toString());
+            elm.setAttribute("mdown", true);
+            setTimeout(() => {
+                let down = elm.getAttribute("mdown");
+                if (down === "false") return;
+
+                console.debug("VIDEO TOUCH DOWN");
+                if (elm.playbackRate == CSP) return;
+                elm.playbackRate = CSP;
+            }, 1500);
         });
 
         elm.addEventListener("touchend", () => {
-            console.debug("VIDEO TOUCH UP");
+
+            elm.setAttribute("mdown", false);
             if (elm.playbackRate == CSP) {
+                console.debug("VIDEO TOUCH UP");
                 elm.playbackRate = 1;
-                toast("SPEED: 1");
                 setTimeout(() => elm.play(), 200);
             }
         });
 
 
         elm.onmousedown = function () {
-            console.debug("VIDEO DOWN");
-            if (elm.playbackRate == CSP) return;
-            elm.playbackRate = CSP;
-            toast("SPEED: " + CSP.toString());
+            elm.setAttribute("mdown", true);
+            setTimeout(() => {
+                let down = elm.getAttribute("mdown");
+                if (down === "false") return;
+                console.debug("VIDEO DOWN");
+                if (elm.playbackRate == CSP) return;
+                elm.playbackRate = CSP;
+            }, 1500);
+
         }
         elm.onmouseup = function () {
-            console.debug("VIDEO UP");
+            elm.setAttribute("mdown", false);
             if (elm.playbackRate == CSP) {
+                console.debug("VIDEO UP");
                 elm.playbackRate = 1;
-                toast("SPEED: 1");
                 setTimeout(() => elm.play(), 200);
             }
         }
