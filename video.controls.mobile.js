@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name                Video Mobile Fabio L.
 // @description         Controls any HTML5 video
-// @version             0.51
+// @version             0.52
 // @namespace           io.bigbear2.video.mobile
 // @include             *
 // @supportURL          https://github.com/ni554n/userscripts/issues
@@ -135,6 +135,7 @@ document.module_video = {
                 break;
             case "canplay":
                 document.module_video.set_actual_video(video);
+                document.module_video.get_video_info();
                 break;
             case "canplaythrough":
                 document.module_video.set_actual_video(video);
@@ -176,6 +177,42 @@ document.module_video = {
 
         if (document.module_video.video_info.valid)
             document.module_video.init_controller(video);
+    },
+    video_speed_click: (elm) => {
+        const CSP = 2.2;
+        console.debug("ADD TOUCH EVENT");
+
+        elm.addEventListener("touchstart", () => {
+            console.debug("VIDEO TOUCH DOWN");
+            if (elm.playbackRate == CSP) return;
+            elm.playbackRate = CSP;
+            toast("SPEED: " + CSP.toString());
+        });
+
+        elm.addEventListener("touchend", () => {
+            console.debug("VIDEO TOUCH UP");
+            if (elm.playbackRate == CSP) {
+                elm.playbackRate = 1;
+                toast("SPEED: 1");
+                setTimeout(() => elm.play(), 200);
+            }
+        });
+
+
+        elm.onmousedown = function () {
+            console.debug("VIDEO DOWN");
+            if (elm.playbackRate == CSP) return;
+            elm.playbackRate = CSP;
+            toast("SPEED: " + CSP.toString());
+        }
+        elm.onmouseup = function () {
+            console.debug("VIDEO UP");
+            if (elm.playbackRate == CSP) {
+                elm.playbackRate = 1;
+                toast("SPEED: 1");
+                setTimeout(() => elm.play(), 200);
+            }
+        }
     },
     get_video_info: () => {
         let video = document.module_video.actual_video;
@@ -224,6 +261,7 @@ document.module_video = {
     set_actual_video: (video) => {
         document.module_video.actual_video = video;
         document.module_video.get_video_info();
+        document.module_video.video_speed_click(video);
 
         if (document.module_video.in_frame) {
             window.parent.document.module_video.actual_video = video;
@@ -238,7 +276,7 @@ document.module_video = {
         }
 
         if (!document.mobileAndTabletCheck()) return;
-        
+
         document.addEventListener("fullscreenchange", function () {
             if (document.fullscreenElement) {
                 document.module_video.actual_video.setAttribute("controls", true);
@@ -634,7 +672,7 @@ document.module_video_controller = {
     },
     mobileFullScreen: () => {
         //https://webdesign.tutsplus.com/fullscreen-button-with-javascript--cms-107168t
-        let video = document.module_video_controller.video;        
+        let video = document.module_video_controller.video;
         if (video.webkitSupportsFullscreen) {
             video.webkitEnterFullscreen();
             return;
