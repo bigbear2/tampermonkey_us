@@ -1,18 +1,27 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.7
+// @version      0.10
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAfdJREFUOE+Fk0trFEEUhc+tdmYRySJbQYIGtxJxIogYIYvgxo1krSiJrozgXxElEGP8CyYrDdkERlSUrPMYiAp5YUhkMl3d9bpSlemxajbeVT36fHXq3GpCX91e27shsmwGzBNZxwxba12peccxVrUxC+tTI99iCVWTyQ/754tB8YqABwBI5AZkXNg21kGpMGbHWLS1+rPv9y7kfiEAvLgcFCsAbgaFY2SnOvEmCwPmsyVmNE2tPukhATD+6eAdgR5WClIWorAJQCkLY7uEAOHFL/cvPaZw53PZ58qNVwlpQPrMflXGOKh0jRVojO40D+dBmI4/Fh0Nik7ze9YxyjJ15YjmaLx52CLC5QRwqkCpATjHKPoAzLTlAQbgLAaEAN2/+3aDgw8yLgYUjS23SgLq8UYn173Eexk4xubvtDMACg/YJODK/wDKMraP+gDMG9RY2p4TRE9jgJQmhBZXrh12jtMrgPk1XXvfatQEvsZt9GH5tsV1Ih122zHAx2wb4SE1llpvBeFRJdDaoVRpy/baBscygc5j9uqTALi+vDtALD8Kwi0/9y3LZWp360hBV0zGGuzQXby4KHs/U4BAvhQITsi3zHYfU7t0+PXHA71tXoAZeu7F/rAeoLLvM8mIpxk0UUgzXBp2P0/0D2XcKojfYHZ0Pc7mL7QpGu6oHMpoAAAAAElFTkSuQmCC
+// @connect      localhost
+// @connect      agrozootecnica.net
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
-// @resource CONSOLE_LOG_JS             https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.js
-// @resource CONSOLE_LOG_DETAILS_JS     https://cdn.jsdelivr.us/gh/bigbear2/tampermonkey_us@master/js/consolelog.detailprint.js
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setValue
+// @grant        GM_getValue
 // ==/UserScript==
 
+'use strict';
+
+const IOK = '📗';
+const IERROR = '📕';
+
 document.userscript_global = {
+    server: "https://localhost/json-stored/index.php",
     bootstrap_version: null,
     video: null,
     setResource: function (name, is_style = false) {
@@ -21,22 +30,13 @@ document.userscript_global = {
             GM_addStyle(remote_resource);
         } else {
             try {
-                eval(remote_resource);  
+                eval(remote_resource);
             } catch (error) {
                 remote_resource = "";
             }
-            
+
         }
         return remote_resource
-    },
-    remoteLog: () => {
-
-        //let s = document.createElement("script");
-        //s.src = "https://jsconsole.com/remote.js?FABIOMCD-74A0-46D3-AE36-757BAB262BEA";
-        //:listen FABIOMCD-74A0-46D3-AE36-757BAB262BEA
-        //s.src = "https://remotejs.com/agent/agent.js";
-        //s.setAttribute("data-consolejs-channel", "9a516f5d-df7c-5876-6351-7ed03c117f9b");
-        //document.head.appendChild(s);
     },
     init: () => {
         document.userscript_global.console();
@@ -73,15 +73,19 @@ document.userscript_global = {
         } catch (error) {
         }
 
-        let elm = document.createElement("script");
-        elm.innerHTML = "console.clear=()=>{}";
-        elm = document.documentElement.appendChild(elm);
-        window.setTimeout(() => {
-            document.documentElement.removeChild(elm);
-            document.userscript_global.setResource("CONSOLE_LOG_JS");
-            document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS");
-            document.userscript_global.log("INIT");
-        }, 10)
+        try {
+            let elm = document.createElement("script");
+            elm.innerHTML = "console.clear=()=>{}";
+            elm = document.documentElement.appendChild(elm);
+            window.setTimeout(() => {
+                document.documentElement.removeChild(elm);
+                /* document.userscript_global.setResource("CONSOLE_LOG_JS");
+                document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS"); */
+                document.userscript_global.log("INIT");
+            }, 10)
+        } catch (error) {
+        }
+
     },
     getBootstrapVersion: () => {
         try {
@@ -125,17 +129,217 @@ document.userscript_global = {
                 document.userscript_global.log("logElementEvents", evt.type, evt.currentTarget);
             }, false);
         })
+    },
+    italianTimeFormat: function (dateUTC) {
+        if (dateUTC) {
+            let jsDateFormat = new Date(dateUTC)
+            let fullStringTime = {
+                day: Number(jsDateFormat.getDate() < 10) ? '0' + jsDateFormat.getDate() : jsDateFormat.getDate(),
+                month: Number((jsDateFormat.getMonth() + 1)) < 10 ? '0' + (jsDateFormat.getMonth() + 1) : (jsDateFormat.getMonth() + 1),
+                year: jsDateFormat.getFullYear(),
+                hours: Number(jsDateFormat.getHours()) < 10 ? '0' + jsDateFormat.getHours() : jsDateFormat.getHours(),
+                minutes: Number(jsDateFormat.getMinutes()) < 10 ? '0' + jsDateFormat.getMinutes() : jsDateFormat.getMinutes()
+            }
+            return fullStringTime.day + '/' + fullStringTime.month + '/' + fullStringTime.year + ' ' +
+                fullStringTime.hours + ':' + fullStringTime.minutes
+        }
+        return null
+    },
+    makeRequest: (_url, _method, _data = "") => {
+        return new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+                method: _method,
+                url: _url,
+                data: _data,
+                onload: response => resolve(response.responseText),
+                onerror: error => reject(error)
+            });
+        });
+    },
+    setValue: async (key, values, callback = null) => {
+        let me = document.userscript_global;
+        if (me.server === "") {
+            let result = {"error": false, "messages": "OK", "data": values};
+            GM_setValue(key, JSON.stringify(data));
+            if (callback != null) callback(JSON.stringify(result));
+            return;
+        }
+
+        let _url = me.server + "?op=set&key=" + key
+        console.debug(IOK + 'GLOBAL setValue URL:', _url);
+        values = JSON.stringify(values);
+        //values = "values=" + encodeURIComponent(values);
+        GM_xmlhttpRequest({
+            method: "POST",
+            url: _url,
+            data: values,
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            onload: function (response) {
+                console.debug(IOK + 'PAGEVISITED RESONSE SET', response.responseText)
+                if (callback != null) callback(response.responseText)
+            }
+
+        });
+
+    },
+    getValue: async (key, defaultValue = "[]", callback = null) => {
+        let me = document.userscript_global;
+        if (me.server === "") {
+            let result = {"error": false, "messages": "OK", "data": []};
+            result.data = GM_getValue(key, defaultValue);
+            if (callback != null) callback(JSON.stringify(result))
+            return;
+        }
+
+        let _url = me.server + "?op=get&key=" + key
+        console.debug(IOK + 'GLOBAL getValue URL:', _url);
+
+        let result = defaultValue;
+
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: _url,
+            onload: function (response) {
+                console.debug(IOK + 'PAGEVISITED RESONSE GET', response.responseText)
+                if (callback != null) callback(response.responseText)
+            }
+        });
     }
 };
 
-(function () {
-    'use strict';
-    document.userscript_global.init();
 
-    window.addEventListener('load', function () {
+document.toast = {
+    T_NORMAL: 0,
+    T_INFO: 1,
+    T_ERROR: 2,
+    is_init: false,
+    init: function () {
+        document.userscript_global.log("Toast", "init");
+
+        if (document.toast.is_init) return;
+        document.toast.is_init = true
+
+
+        let css = `
+                #snackbar {
+                    visibility: hidden;
+                    min-width: 250px;
+                    margin-left: -125px;
+                    background-color: #56a2e0;
+                    color: black;
+                    text-align: center;
+                    border-radius: 2px;
+                    padding: 16px;
+                    position: fixed;
+                    z-index: 1;
+                    left: 50%;
+                    bottom: 30px;
+                    font-size: 17px;
+                }
+                #snackbar.error {
+                    background-color: #e05656 !important;
+                    color: #fff !important;
+                }
+                #snackbar.info {
+                    background-color: #bcd369 !important;
+                    color: black !important;
+                }
+                #snackbar.show {
+                    visibility: visible;
+                    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+                    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+                }
+
+                @-webkit-keyframes fadein {
+                    from {bottom: 0; opacity: 0;} 
+                    to {bottom: 30px; opacity: 1;}
+                }
+
+                @keyframes fadein {
+                    from {bottom: 0; opacity: 0;}
+                    to {bottom: 30px; opacity: 1;}
+                }
+
+                @-webkit-keyframes fadeout {
+                    from {bottom: 30px; opacity: 1;} 
+                    to {bottom: 0; opacity: 0;}
+                }
+
+                @keyframes fadeout {
+                    from {bottom: 30px; opacity: 1;}
+                    to {bottom: 0; opacity: 0;}
+                }
+        `;
+        GM_addStyle(css);
+
+        let obj_css = `<div id="snackbar">Some text some message..</div>`;
+        document.body.insertAdjacentHTML("beforeend", obj_css);
+
+    },
+    notify: function (message, duration = 10000, typeMessage = document.toast.T_NORMAL) {
+        document.userscript_global.log("Toast", "notify");
+        if (!document.toast.is_init) return;
+
+        let part = "✉️";
+        let x = document.getElementById("snackbar");
+        x.classList.remove("error");
+        x.classList.remove("info");
+        if (typeMessage === document.toast.T_INFO) {
+            x.classList.add("info");
+            part = "💬";
+        }
+        if (typeMessage === document.toast.T_ERROR) {
+            x.classList.add("error");
+            part = "⚠️";
+        }
+
+        x.innerHTML = part + ' ' + message;
+        x.className = "show";
+        setTimeout(function () {
+            x.className = x.className.replace("show", "");
+        }, duration);
+
+    }
+
+};
+
+function trustedTypesInit() {
+    let sec = document.querySelector("#trustedTypes");
+    if (sec !== null) return;
+
+    try {
+        if (window.trustedTypes && window.trustedTypes.createPolicy) {
+            window.trustedTypes.createPolicy('default', {
+                createHTML: (string, sink) => string
+            });
+        }
+
+    } catch (e) {
+        return;
+    }
+
+    const metaElement = document.createElement('meta');
+    metaElement.id = "trustedTypes";
+    metaElement.setAttribute("http-equiv", "Content-Security-Policy");
+    metaElement.setAttribute("content", "trusted-types test");
+
+    'use strict';
+    metaElement.innerHTML = window.trustedTypes.defaultPolicy.createHTML("");
+    document.head.appendChild(metaElement);
+}
+
+(async function () {
+    trustedTypesInit();
+
+
+    document.userscript_global.init();
+    document.toast.init();
+
+    window.addEventListener('load', async function () {
+
         document.userscript_global.getBootstrapVersion();
         document.userscript_global.log("GLOBAL FUNCTION", "BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
-    }, false);
 
+    }, false);
 
 })();
