@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.22
+// @version      0.29
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -37,6 +37,9 @@ console.log('📓: canceled status message');
 console.log('📔: Or anything you like and want to recognize immediately by color');
 */
 
+const IOK = '📗';
+const IERROR = '📕';
+
 function errorLog(...args) {
     console.debug('📙 ERROR', args);
 }
@@ -65,7 +68,9 @@ function evalTwo(value) {
 
 document.mobileAndTabletCheck = function () {
     let check = false;
-    (function (a) { if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true; })(navigator.userAgent || navigator.vendor || window.opera);
+    (function (a) {
+        if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
+    })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
 };
 
@@ -85,7 +90,6 @@ function get_pornhub_info() {
 
     //TITLE
     data.title = document.title.replace(" - Pornhub.com", '').trim();
-
 
 
     //TAGS
@@ -175,8 +179,8 @@ function get_xhamster_info() {
 
 
 const elementIsVisibleInViewport = (el, partiallyVisible = false) => {
-    const { top, left, bottom, right } = el.getBoundingClientRect();
-    const { innerHeight, innerWidth } = window;
+    const {top, left, bottom, right} = el.getBoundingClientRect();
+    const {innerHeight, innerWidth} = window;
     return partiallyVisible
         ? ((top > 0 && top < innerHeight) ||
             (bottom > 0 && bottom < innerHeight)) &&
@@ -255,7 +259,7 @@ function spankbangColorizeTime() {
             let t_time = typeTime(text, false);
             let time = text * 60;
 
-            console.debug(text, t_time, time);
+            //console.debug(text, t_time, time);
 
             let item = elm.parentNode.parentNode;
             let record = {
@@ -288,7 +292,6 @@ function hentaicityColorizeTime() {
         try {
             let elm = collection[i];
             let text = elm.innerText;
-
 
 
             let t_time = typeTime(text, true);
@@ -326,7 +329,6 @@ function epornerColorizeTime() {
         try {
             let elm = collection[i];
             let text = elm.innerText;
-
 
 
             let t_time = typeTime(text, true);
@@ -537,7 +539,7 @@ function fuqColorizeTime() {
             item.classList.add("us-watched-min-" + t_time.toString());
             elm.style.fontSize = "20px";
 
-            console.log(time)
+            //console.log(time)
 
         } catch (error) {
             console.log(error.message)
@@ -705,6 +707,7 @@ function startColorizeTime(l) {
 }
 
 document.us_vtc = {
+    is_autoplay: false,
     zoom_14: ['4kporn.xxx', 'fapnfuck.com', 'b1gtits.com'],
     zoom_12: ['www.analgalore.com', 'www.fuq.com', 'www.fucd.com'],
     is_xvideos: (window.location.host.indexOf('xvideos.com') > -1),
@@ -748,9 +751,11 @@ document.us_vtc = {
         let host = window.location.host;
         let body = document.querySelector("body");
         if (!document.mobileAndTabletCheck()) {
-            if (me.zoom_14.includes(host)) body.style.zoom = "1.4";
+            if (me.zoom_14.includes(host)) body.style.zoom = "1.2";
             if (me.zoom_12.includes(host)) body.style.zoom = "1.2";
         }
+
+        me.autoplay();
 
         if (document.us_vtc.fnColorizeTime === null) return;
 
@@ -815,7 +820,6 @@ document.us_vtc = {
                     box-shadow: 5px 5px 15px 5px #000000!important;
                     background-color: #282828!important;
                     position: fixed;
-                    transition: .2s;
                     padding: 4px;
                     width: 160px;
                     color: white! important;
@@ -1138,6 +1142,27 @@ document.us_vtc = {
         }
 
 
+    },
+    autoplay: () => {
+        let me = document.us_vtc;
+        console.debug("AUTOPLAY", me.is_autoplay);
+
+        if (me.is_autoplay) return;
+
+        let btn = null;
+        let host = window.location.host;
+        if (host === 'www.hentaiworld.me') btn = "#player > div.cover";
+        if (host === 'xhamster.com') btn = "#player-container > div.xplayer-start-button";
+
+        if (btn === null) return;
+        try {
+            document.querySelector(btn).click()
+        } catch (e) {
+            //console.debug(e.message, e);
+        }
+
+
+        me.is_autoplay = true;
 
     },
     removeBanner: () => {
@@ -1155,7 +1180,8 @@ document.us_vtc = {
 
         try {
             $('div[class*=overlay]').remove();
-        } catch (e) { }
+        } catch (e) {
+        }
 
 
         banner = getElementByText("div", "download full length");
@@ -1167,6 +1193,13 @@ document.us_vtc = {
         banner = document.querySelectorAll('[ class*="rectangle--video" ]');
         if (banner.length > 0) banner[0].remove();
 
+        let collection = document.querySelector(".thumb-list--sidebar");
+        if (collection === null) return;
+        for (let i = 0; i < collection.childElementCount; i++) {
+            let item = collection.children[i];
+            let is_thumb = item.classList.contains("thumb-list__item");
+            if (!is_thumb) item.remove();
+        }
 
     },
     sortVideos: () => {
@@ -1288,16 +1321,20 @@ document.us_vtc = {
     },
 }
 
+
 document.pagevisited = {
     update: false,
     added_href: false,
     pages: [],
     is_init: false,
     bookmarks: [],
+    bookmarks_remote: [],
     remote_js: "",
     remote_css: "",
     notify_ready: false,
+    last_record: null,
     init: function () {
+        let me = document.pagevisited;
         if (document.pagevisited.is_init) return;
         document.pagevisited.is_init = true
 
@@ -1320,10 +1357,10 @@ document.pagevisited = {
                 color: white! important;
             }
 
-            .pv-footer-hide{
+            .pv-info-hide{
                 display:none;
             }
-            #pv-footer {
+            #pv-info {
                 position: fixed;
                 top: 0;
                 background: crimson;
@@ -1333,16 +1370,19 @@ document.pagevisited = {
                 font-size: 13px;
                 font-family: sans-serif;
                 font-weight: bold;
-                text-shadow: 0 1px 0 #84BAFF;
-                box-shadow: 0 0 15px #00214B;
                 z-index: 99999;
-                right: 0;
+                right: -90px;
                 padding: 6px;
                 opacity: 0.6;
+                filter: alpha(opacity=60);
+                transition: 0.3s;
             }
 
-            #pv-footer:hover{
+            #pv-info:hover{
                 opacity: 1;
+                filter: alpha(opacity=100);
+                transition: 0.3s;
+                right: 4px;
             }
             
             tooltip {
@@ -1370,17 +1410,39 @@ document.pagevisited = {
         } catch (error) {
             errorLog('pageVisited', 'ERRORE', error.message);
         }
-        document.pagevisited.bookmarks = GM_getValue("pageVisited", "[]");
-        document.pagevisited.bookmarks = JSON.parse(document.pagevisited.bookmarks);
-        //infoLog(document.pagevisited.bookmarks);
+        debugLog('pageVisited', 'notify_ready', document.pagevisited.notify_ready);
 
-        let obj_css = `<div id="pv-footer" class="pv-footer-hide" onclick='this.remove()' style='cursor: pointer;'>VISITED</div>`;
+        let obj_css = `<div id="pv-info" class="pv-info-hide" onclick="document.querySelector('#pv-info').remove();" style='cursor: pointer;'>VISITED</div>`;
         document.body.insertAdjacentHTML("beforeend", obj_css);
 
+        me.startProcess();
 
+
+        //infoLog(document.pagevisited.bookmarks);
+
+
+        try {
+
+            let collection = document.querySelectorAll("a");
+            for (let i = 0; i < collection.length; i++) {
+                let object = collection[i];
+                object.addEventListener("click", (ref) => {
+                    debugLog("CLIKKKKK", ref);
+                });
+            }
+            ;
+
+
+        } catch (error) {
+            errorLog('pageVisited', 'ERRORE', error.message);
+        }
     },
     notify: function (message, _duration = 10000, error = true) {
-        if (!document.pagevisited.notify_ready) return;
+        if (!document.pagevisited.notify_ready) {
+            document.toast.notify(message, _duration, (error) ? document.toast.T_ERROR : document.toast.T_NORMAL);
+            return;
+        }
+        ;
 
         Toastify({
             text: message,
@@ -1398,22 +1460,32 @@ document.pagevisited = {
             if (href === elm.href) {
                 return elm.last_view;
             }
-        };
+        }
+        ;
         return "";
     },
-    execute: function () {
+    remoteExist: function (href) {
+        let me = document.pagevisited;
+        for (let i = 0; i < me.bookmarks_remote.length; i++) {
+            if (href === me.bookmarks_remote[i].href) return item;
+        }
+        return null;
+    },
+    execute: function (title, href) {
+        let me = document.pagevisited;
         document.pagevisited.init();
-        let title = document.title;
-        let href = window.location.href;
+
         let added = false;
         let last_view = null;
         let index = -1;
         let adesso = Date.now();
-        adesso = document.pagevisited.italianTimeFormat(adesso);
+        adesso = document.userscript_global.italianTimeFormat(adesso);
 
 
         let min = 10 * 60000;
-        setTimeout(function () { document.pagevisited.update = false; }, min);
+        setTimeout(function () {
+            document.pagevisited.update = false;
+        }, min);
 
         if (document.pagevisited.added_href) return;
         if (document.pagevisited.update) return;
@@ -1432,9 +1504,10 @@ document.pagevisited = {
         if (added) {
             try {
                 document.pagevisited.notify('VISITATO: ' + last_view);
-                let element = document.querySelector("#pv-footer");
+                let element = document.querySelector("#pv-info");
                 element.innerHTML = "&#10006; VISITATO:<br>" + last_view;
-                element.classList.remove("pv-footer-hide");
+                element.classList.remove("pv-info-hide");
+
 
             } catch (error) {
                 errorLog('pageVisited', 'ERRORE', error.message);
@@ -1448,12 +1521,15 @@ document.pagevisited = {
                 "last_view": adesso,
             }
             document.pagevisited.bookmarks.push(elm);
+            if (me.bookmarks_remote !== null) me.bookmarks_remote.push(elm);
+
+
             debugLog('pageVisited', 'AGGIUNTO');
             document.pagevisited.added_href = true;
             document.pagevisited.notify('AGGIUNTO', 5000, false);
         }
-        let json = JSON.stringify(document.pagevisited.bookmarks);
-        GM_setValue("pageVisited", json)
+
+        me.endProcess();
 
         setTimeout(() => {
             let collection = document.querySelectorAll("a");
@@ -1464,7 +1540,7 @@ document.pagevisited = {
                 let view = document.pagevisited.exist(element.href);
 
                 if (hint === null) {
-                    hint = "📘";
+                    hint = "📒 " + element.href;
                     element.setAttribute("title", hint);
                 }
 
@@ -1492,20 +1568,53 @@ document.pagevisited = {
 
         }, 1000);
     },
-    italianTimeFormat: function (dateUTC) {
-        if (dateUTC) {
-            let jsDateFormat = new Date(dateUTC)
-            let fullStringTime = {
-                day: Number(jsDateFormat.getDate() < 10) ? '0' + jsDateFormat.getDate() : jsDateFormat.getDate(),
-                month: Number((jsDateFormat.getMonth() + 1)) < 10 ? '0' + (jsDateFormat.getMonth() + 1) : (jsDateFormat.getMonth() + 1),
-                year: jsDateFormat.getFullYear(),
-                hours: Number(jsDateFormat.getHours()) < 10 ? '0' + jsDateFormat.getHours() : jsDateFormat.getHours(),
-                minutes: Number(jsDateFormat.getMinutes()) < 10 ? '0' + jsDateFormat.getMinutes() : jsDateFormat.getMinutes()
-            }
-            return fullStringTime.day + '/' + fullStringTime.month + '/' + fullStringTime.year + ' ' +
-                fullStringTime.hours + ':' + fullStringTime.minutes
+    startProcess: () => {
+        let me = document.pagevisited;
+        let title = document.title;
+        let href = window.location.href;
+
+
+        document.pagevisited.bookmarks = GM_getValue("pageVisited", "[]");
+        document.pagevisited.bookmarks = JSON.parse(document.pagevisited.bookmarks);
+
+        try {
+            document.userscript_global.getValue("pageVisited", "[]", (json) => {
+                json = JSON.parse(json);
+                me.bookmarks_remote = json.data;
+                console.debug(IOK + 'PAVEVISITED', "GET VALUE", json, me.bookmarks_remote)
+                me.execute(title, href);
+            });
+        } catch (e) {
+            console.debug(IERROR + "PAVEVISITED", 'GET VALUE', e)
+            me.bookmarks_remote = null;
+            me.execute(title, href);
         }
-        return null
+    },
+    endProcess: () => {
+        let me = document.pagevisited;
+
+        setTimeout(() => {
+            let json = JSON.stringify(document.pagevisited.bookmarks);
+            GM_setValue("pageVisited", json)
+
+            try {
+                if (me.bookmarks_remote === null) return;
+                document.userscript_global.setValue("pageVisited", me.bookmarks_remote, (json) => {
+                    json = JSON.parse(json);
+                    me.bookmarks_remote = json.data;
+                    console.debug(IOK + 'PAVEVISITED', "SET VALUE", json, me.bookmarks_remote)
+                });
+            } catch (e) {
+                console.debug(IERROR + "PAVEVISITED", 'SET VALUE', e)
+            }
+
+
+        }, 1000)
+    },
+    cloneProcess: () => {
+        let me = document.pagevisited;
+        me.bookmarks_remote = {...me.bookmarks};
+        me.endProcess();
     },
     tooltips: function () {
 
@@ -1581,11 +1690,12 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
     document.us_vtc.init();
 }, "q");
 
-
 (async function () {
 
+
     window.addEventListener('load', async function () {
-        document.pagevisited.execute();
+
+        document.pagevisited.startProcess();
         document.us_vtc.init();
 
         $(window).on('popstate', function () {
@@ -1595,14 +1705,17 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
         window.addEventListener("pageshow", function (event) {
             let historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
             if (historyTraversal) {
-                document.pagevisited.execute();
+                document.pagevisited.startProcess();
                 document.us_vtc.init();
             }
         });
 
         document.onvisibilitychange = function () {
             debugLog("PAGEVISITED", "onvisibilitychange", document.hidden);
-            if (!document.hidden) document.pagevisited.execute();
+            if (!document.hidden) {
+                document.pagevisited.startProcess();
+                document.us_vtc.autoplay();
+            }
             document.us_vtc.init();
         };
 
