@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.29
+// @version      0.30
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -9,10 +9,7 @@
 // @include      http://*
 // @include      https://*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lovenselife.com
-// @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
-// @require  https://cdn.jsdelivr.net/npm/toastify-js
-// @resource REMOTE_JS     https://cdn.jsdelivr.net/npm/toastify-js
-// @resource REMOTE_CSS     https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css
+// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_getResourceText
@@ -1396,21 +1393,6 @@ document.pagevisited = {
 
         GM_addStyle(css);
 
-        document.pagevisited.remote_css = GM_getResourceText("REMOTE_CSS");
-        GM_addStyle(document.pagevisited.remote_css);
-        //debug(document.pagevisited.remote_css);
-
-
-        //debug(document.pagevisited.remote_js);
-        try {
-            document.pagevisited.remote_js = GM_getResourceText("REMOTE_JS");
-            eval(document.pagevisited.remote_js);
-            document.pagevisited.notify_ready = true;
-
-        } catch (error) {
-            errorLog('pageVisited', 'ERRORE', error.message);
-        }
-        debugLog('pageVisited', 'notify_ready', document.pagevisited.notify_ready);
 
         let obj_css = `<div id="pv-info" class="pv-info-hide" onclick="document.querySelector('#pv-info').remove();" style='cursor: pointer;'>VISITED</div>`;
         document.body.insertAdjacentHTML("beforeend", obj_css);
@@ -1438,20 +1420,7 @@ document.pagevisited = {
         }
     },
     notify: function (message, _duration = 10000, error = true) {
-        if (!document.pagevisited.notify_ready) {
-            document.toast.notify(message, _duration, (error) ? document.toast.T_ERROR : document.toast.T_NORMAL);
-            return;
-        }
-        ;
-
-        Toastify({
-            text: message,
-            duration: _duration,
-            close: true,
-            className: (error) ? "toast-error" : "toast-info",
-            gravity: "top", // `top` or `bottom`
-            position: "center", // `left`, `center` or `right`
-        }).showToast();
+        document.toast.notify(message, _duration, (error) ? document.toast.T_ERROR : document.toast.T_NORMAL);
 
     },
     exist: function (href) {
