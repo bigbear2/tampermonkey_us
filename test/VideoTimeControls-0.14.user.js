@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.30
+// @version      0.34
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -36,6 +36,7 @@ console.log('📔: Or anything you like and want to recognize immediately by col
 
 const IOK = '📗';
 const IERROR = '📕';
+const IWARNING = '📙';
 
 function errorLog(...args) {
     console.debug('📙 ERROR', args);
@@ -70,6 +71,10 @@ document.mobileAndTabletCheck = function () {
     })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
 };
+
+document.module_xhamster = {
+    data: [],
+}
 
 function get_pornhub_info() {
     debugLog("get_pornhub_info")
@@ -122,6 +127,37 @@ function get_pornhub_info() {
 
     return data;
 };
+
+document.get_xhamster_search = function () {
+    console.debug(IOK + 'get_xhamster_search');
+
+    let modulo = document.module_xhamster;
+    document.userscript_global.getValue("xhamster_search", "[]", (resp) => {
+        resp = JSON.parse(resp);
+        modulo.data = JSON.parse(resp.data);
+        console.debug(IOK + 'get_xhamster_search', modulo.data);
+
+        setTimeout(() => document.set_xhamster_search(), 1000);
+    });
+}
+
+document.set_xhamster_search = function () {
+    if ((window.location.href.indexOf("/tags/") == -1) && (window.location.href.indexOf("/search/") == -1)) return;
+    console.debug(IOK + 'set_xhamster_search');
+
+    let collection = document.getElementsByClassName("thumb-list__item");
+    let xhamster_search = [];
+    for (let i = 0; i < collection.length; i++) {
+        let elm = collection[i];
+        elm = elm.querySelector(".video-thumb__image-container")
+        let href = elm.href;
+        xhamster_search.push(href);
+    }
+    document.userscript_global.setValue("xhamster_search", xhamster_search);
+    console.debug(IOK, xhamster_search);
+
+
+}
 
 function get_xhamster_info() {
     debugLog("get_xhamster_info")
@@ -176,8 +212,8 @@ function get_xhamster_info() {
 
 
 const elementIsVisibleInViewport = (el, partiallyVisible = false) => {
-    const {top, left, bottom, right} = el.getBoundingClientRect();
-    const {innerHeight, innerWidth} = window;
+    const { top, left, bottom, right } = el.getBoundingClientRect();
+    const { innerHeight, innerWidth } = window;
     return partiallyVisible
         ? ((top > 0 && top < innerHeight) ||
             (bottom > 0 && bottom < innerHeight)) &&
@@ -453,7 +489,7 @@ function xvideosColorizeTime() {
 
     /*     for (let i = 0; i < element_video.length; i++) {
             let item = element_video[i];
-    
+
         } */
 }
 
@@ -696,6 +732,108 @@ function durationColorizeTime() {
 
 }
 
+function universalColorizeTime() {
+
+    let count = 0;
+    let selectorID = document.us_vtc.is_groups_global_selector;
+    debugLog(IWARNING + "universalColorizeTime", selectorID);
+
+    const collection = document.querySelectorAll(selectorID);
+    for (let i = 0; i < collection.length; i++) {
+        let elm = collection[i];
+
+        if (elm == undefined) continue;
+
+        let time_text = collection[i].innerText.toLowerCase();
+
+        time_text = time_text.replace("1080p", "").replace("720p", "").trim();
+        time_text = time_text.replace("hd", "").replace("vr", "").trim();
+        time_text = time_text.trim();
+
+        let type_format = "";
+        if (time_text.indexOf("min") > -1) type_format = "m"
+        if (time_text.indexOf(":") > -1) type_format = ":"
+        if (type_format == "") continue;
+
+        count++;
+
+        type_format = (type_format == ":");
+
+        let time_seconds = 0;
+        let t_time = typeTime(time_text, type_format);
+
+        try {
+            time_seconds = timeToSeconds(time_text);
+
+        } catch (error) {
+            errorLog("ERRORE timeToSeconds", error);
+            return;
+        }
+
+        let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
+        let record = {
+            "element": item,
+            "seconds": time_seconds,
+            "time": time_text,
+        }
+        element_video.push(record);
+
+        elm.style.color = time_colors[t_time];
+        item.classList.add("us-watched-min-" + t_time.toString());
+        elm.style.fontSize = "20px";
+
+        elm.style.fontSize = "20px";
+        elm.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+        elm.style.padding = '4px';
+        elm.style.borderRadius = '6px';
+
+    }
+
+    debugLog(IWARNING + "universalColorizeTime Count", count);
+
+}
+
+document.onClickLinkPageVisited = () => {
+    console.debug("BOOOOOOOOOOOOO", this);
+}
+
+document.onClickPageVisited = () => {
+    return;
+    let count = 0;
+
+    const collection = document.querySelectorAll("a");
+    for (let i = 0; i < collection.length; i++) {
+
+        let elm = collection[i];
+        if (elm == undefined || elm == null) continue;
+
+
+        let href = elm.href;
+        let title = elm.innerText.toString();
+
+        if (href == "#" || href == "#PV") continue;
+        elm.setAttribute("furl", href);
+        elm.href = "javascript:document.onClickLinkPageVisited();";
+        elm.addEventListener("click", (ref) => {
+            debugLog(IOK + "CLIKKKKK", ref.target);
+            removeEventListener(elm, "click");
+
+            href = elm.href;
+            title = elm.innerText.toString();
+            document.pagevisited.execute(title, href);
+
+
+            let me = ref.target;
+            me.href = me.getAttribute("furl");
+            setTimeout(() => me.click(), 1500);
+        });
+        count++;
+    }
+
+    debugLog(IWARNING + "onClickPageVisited", count);
+}
+
+
 function startColorizeTime(l) {
     colorizeTime();
     setInterval(function () {
@@ -714,9 +852,10 @@ document.us_vtc = {
     is_xhamster: (window.location.host.indexOf('xhamster.') > -1),
     is_eporner: (window.location.host.indexOf('.eporner.com') > -1),
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
-    is_fuq: (window.location.host.indexOf('fuq.com') > -1),
-    is_analgalore: (window.location.host.indexOf('analgalore.com') > -1),
+    is_groups_fuq: ['fuq.com', 'www.analgalore.com', 'www.findtubes.com'],
     is_hentaicity: (window.location.host.indexOf('hentaicity.com') > -1),
+    is_groups_global: ['pornloupe.com'],
+    is_groups_global_selector: ['.time-holder'],
     fnColorizeTime: null,
     is_change_filter: true,
     on_apply_filter: false,
@@ -734,6 +873,11 @@ document.us_vtc = {
         if (document.us_vtc.is_init) return;
         document.us_vtc.is_init = true;
 
+        me.is_groups_fuq = me.is_groups_fuq.indexOf(window.location.host) > -1;
+
+        me.is_groups_global_idx = me.is_groups_global.indexOf(window.location.host);
+        me.is_groups_global = me.is_groups_global.indexOf(window.location.host) > -1;
+
 
         if (document.us_vtc.is_xvideos) document.us_vtc.fnColorizeTime = xvideosColorizeTime;
         if (document.us_vtc.is_redtube) document.us_vtc.fnColorizeTime = redtubeColorizeTime;
@@ -742,8 +886,18 @@ document.us_vtc = {
         if (document.us_vtc.is_hentaicity) document.us_vtc.fnColorizeTime = hentaicityColorizeTime;
         if (document.us_vtc.is_xhamster) document.us_vtc.fnColorizeTime = xHamsterColorizeTime;
         if (document.us_vtc.is_pornhub) document.us_vtc.fnColorizeTime = durationColorizeTime;
-        if (document.us_vtc.is_fuq || document.us_vtc.is_analgalore) document.us_vtc.fnColorizeTime = fuqColorizeTime;
+        if (me.is_groups_fuq) document.us_vtc.fnColorizeTime = fuqColorizeTime;
         if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
+
+        if (me.is_groups_fuq) {
+            setTimeout(() => document.onClickPageVisited(), 1500);
+        }
+
+        if (me.is_groups_global) {
+            me.is_groups_global_selector = me.is_groups_global_selector[me.is_groups_global_idx];
+            document.us_vtc.fnColorizeTime = universalColorizeTime;
+        }
+
 
         let host = window.location.host;
         let body = document.querySelector("body");
@@ -764,7 +918,10 @@ document.us_vtc = {
         document.us_vtc.loadFilter();
 
 
-        if (document.us_vtc.is_xhamster) document.us_vtc.enlargeContains();
+        if (document.us_vtc.is_xhamster) {
+            document.get_xhamster_search();
+            document.us_vtc.enlargeContains();
+        }
         debugLog("STAR COLORIZE");
         document.us_vtc.fnColorizeTime();
 
@@ -1146,14 +1303,30 @@ document.us_vtc = {
 
         if (me.is_autoplay) return;
 
+        let video_click = false;
         let btn = null;
         let host = window.location.host;
-        if (host === 'www.hentaiworld.me') btn = "#player > div.cover";
+        if (host === 'www.hentaiworld.me') {
+            btn = "#player > div.cover";
+            video_click = true;
+        }
         if (host === 'xhamster.com') btn = "#player-container > div.xplayer-start-button";
+        if (host === 'www.xvideos.com') btn = "#anc-tst-play-btn";
 
         if (btn === null) return;
         try {
-            document.querySelector(btn).click()
+            document.querySelector(btn).click();
+            if (video_click) {
+                setTimeout(() => {
+                    console.debug(IERROR + "VIDEO PLAY")
+                    try {
+                        document.querySelector("video").play();
+                    } catch (error) {
+                        console.debug(IERROR + "ERRORE", error)
+                    }
+
+                }, 5000);
+            }
         } catch (e) {
             //console.debug(e.message, e);
         }
@@ -1359,7 +1532,7 @@ document.pagevisited = {
             }
             #pv-info {
                 position: fixed;
-                top: 0;
+                bottom: 4px;
                 background: crimson;
                 line-height: 2;
                 text-align: center;
@@ -1368,10 +1541,10 @@ document.pagevisited = {
                 font-family: sans-serif;
                 font-weight: bold;
                 z-index: 99999;
-                right: -90px;
+                left: -90px;
                 padding: 6px;
-                opacity: 0.6;
-                filter: alpha(opacity=60);
+                opacity: 0.5;
+                filter: alpha(opacity=50);
                 transition: 0.3s;
             }
 
@@ -1379,9 +1552,9 @@ document.pagevisited = {
                 opacity: 1;
                 filter: alpha(opacity=100);
                 transition: 0.3s;
-                right: 4px;
+                left: 4px;
             }
-            
+
             tooltip {
                 position: fixed;
                 background: #fff;
@@ -1401,7 +1574,7 @@ document.pagevisited = {
 
 
         //infoLog(document.pagevisited.bookmarks);
-
+        return;
 
         try {
 
@@ -1490,7 +1663,7 @@ document.pagevisited = {
                 "last_view": adesso,
             }
             document.pagevisited.bookmarks.push(elm);
-            if (me.bookmarks_remote !== null) me.bookmarks_remote.push(elm);
+            //if (me.bookmarks_remote !== null) me.bookmarks_remote.push(elm);
 
 
             debugLog('pageVisited', 'AGGIUNTO');
@@ -1499,6 +1672,7 @@ document.pagevisited = {
         }
 
         me.endProcess();
+        return;
 
         setTimeout(() => {
             let collection = document.querySelectorAll("a");
@@ -1550,7 +1724,9 @@ document.pagevisited = {
             document.userscript_global.getValue("pageVisited", "[]", (json) => {
                 json = JSON.parse(json);
                 me.bookmarks_remote = json.data;
-                console.debug(IOK + 'PAVEVISITED', "GET VALUE", json, me.bookmarks_remote)
+                if (typeof me.bookmarks_remote === 'object' && !Array.isArray(me.bookmarks_remote) && me.bookmarks_remote !== null)
+                    me.bookmarks_remote = Object.values(me.bookmarks_remote);
+                //console.debug(IOK + 'PAVEVISITED', "GET VALUE", json, me.bookmarks_remote)
                 me.execute(title, href);
             });
         } catch (e) {
@@ -1571,7 +1747,7 @@ document.pagevisited = {
                 document.userscript_global.setValue("pageVisited", me.bookmarks_remote, (json) => {
                     json = JSON.parse(json);
                     me.bookmarks_remote = json.data;
-                    console.debug(IOK + 'PAVEVISITED', "SET VALUE", json, me.bookmarks_remote)
+                    //console.debug(IOK + 'PAVEVISITED', "SET VALUE", json, me.bookmarks_remote)
                 });
             } catch (e) {
                 console.debug(IERROR + "PAVEVISITED", 'SET VALUE', e)
@@ -1582,7 +1758,7 @@ document.pagevisited = {
     },
     cloneProcess: () => {
         let me = document.pagevisited;
-        me.bookmarks_remote = {...me.bookmarks};
+        me.bookmarks_remote = { ...me.bookmarks };
         me.endProcess();
     },
     tooltips: function () {
@@ -1691,3 +1867,35 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
     }, false);
 
 })();
+
+function fulls() {
+
+    
+    const STYLE1 = "1200px !important";
+    const STYLE2 = "1200px";
+
+    let exlude = ['HTML', 'BODY', 'MAIN', 'SECTION'];
+    let video = document.querySelector("video");
+    let iframe = document.querySelector("iframe");
+    if (iframe != null) video = document.querySelector("iframe");;
+
+    video.style.width = STYLE1;
+
+    for (let i = 0; i < 10; i++) {
+        let node = video.parentNode;
+
+        if (exlude.indexOf(node.tagName) > -1) break;
+        let s = node.getAttribute("style");
+        if (s == null) s = "";
+        if (s.indexOf("width") > -1) s = s.replace("width", "swind");
+        s = "width: " + STYLE1 + ";" + s;
+        console.log(i, node.tagName, s);
+        node.setAttribute("style", s);
+        //node.style.width = STYLE1;
+        video = video.parentNode;
+    }
+
+
+
+
+}
