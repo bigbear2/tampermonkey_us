@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.10
+// @version      0.12
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
@@ -21,7 +21,8 @@ const IOK = '📗';
 const IERROR = '📕';
 
 document.userscript_global = {
-    server: "https://localhost/json-stored/index.php",
+    server: "https://www.agrozootecnica.net/json-stored/index.php",
+    use_GM_fn: true,
     bootstrap_version: null,
     video: null,
     setResource: function (name, is_style = false) {
@@ -158,9 +159,9 @@ document.userscript_global = {
     },
     setValue: async (key, values, callback = null) => {
         let me = document.userscript_global;
-        if (me.server === "") {
+        if (me.use_GM_fn) {
             let result = {"error": false, "messages": "OK", "data": values};
-            GM_setValue(key, JSON.stringify(data));
+            GM_setValue(key, JSON.stringify(values));
             if (callback != null) callback(JSON.stringify(result));
             return;
         }
@@ -174,8 +175,11 @@ document.userscript_global = {
             url: _url,
             data: values,
             headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            onerror: function (response) {
+                if (callback != null) callback("[]")
+            },
             onload: function (response) {
-                console.debug(IOK + 'PAGEVISITED RESONSE SET', response.responseText)
+                //console.debug(IOK + 'PAGEVISITED RESONSE SET', response.responseText)
                 if (callback != null) callback(response.responseText)
             }
 
@@ -184,8 +188,9 @@ document.userscript_global = {
     },
     getValue: async (key, defaultValue = "[]", callback = null) => {
         let me = document.userscript_global;
-        if (me.server === "") {
-            let result = {"error": false, "messages": "OK", "data": []};
+        let result = {"error": false, "messages": "OK", "data": []};
+        if (me.use_GM_fn) {
+
             result.data = GM_getValue(key, defaultValue);
             if (callback != null) callback(JSON.stringify(result))
             return;
@@ -194,13 +199,15 @@ document.userscript_global = {
         let _url = me.server + "?op=get&key=" + key
         console.debug(IOK + 'GLOBAL getValue URL:', _url);
 
-        let result = defaultValue;
 
         GM_xmlhttpRequest({
             method: "GET",
             url: _url,
+            onerror: function (response) {
+                if (callback != null) callback("[]")
+            },
             onload: function (response) {
-                console.debug(IOK + 'PAGEVISITED RESONSE GET', response.responseText)
+                //console.debug(IOK + 'PAGEVISITED RESONSE GET', response)
                 if (callback != null) callback(response.responseText)
             }
         });
