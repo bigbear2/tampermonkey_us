@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.34
+// @version      0.36
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -23,6 +23,7 @@ const emoji_error = "\u{1F4A2}";
 const emoji_info = "ℹ️ℹ️";
 var is_initialize = false;
 var element_video = [];
+var universal_parent_count = 5;
 const time_colors = ['white', '#FFFF00', '#00FF00', '#00FFFF', '#FF00FF'];
 
 /*
@@ -212,8 +213,8 @@ function get_xhamster_info() {
 
 
 const elementIsVisibleInViewport = (el, partiallyVisible = false) => {
-    const { top, left, bottom, right } = el.getBoundingClientRect();
-    const { innerHeight, innerWidth } = window;
+    const {top, left, bottom, right} = el.getBoundingClientRect();
+    const {innerHeight, innerWidth} = window;
     return partiallyVisible
         ? ((top > 0 && top < innerHeight) ||
             (bottom > 0 && bottom < innerHeight)) &&
@@ -748,6 +749,7 @@ function universalColorizeTime() {
 
         time_text = time_text.replace("1080p", "").replace("720p", "").trim();
         time_text = time_text.replace("hd", "").replace("vr", "").trim();
+        time_text = time_text.replace("4k", "").trim();
         time_text = time_text.trim();
 
         let type_format = "";
@@ -770,7 +772,9 @@ function universalColorizeTime() {
             return;
         }
 
-        let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
+        item = elm;
+        for (let x = 0; x < document.us_vtc.is_groups_global_parent; x++) item = item.parentNode;
+        //let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
         let record = {
             "element": item,
             "seconds": time_seconds,
@@ -788,7 +792,7 @@ function universalColorizeTime() {
         elm.style.borderRadius = '6px';
 
     }
-
+    console.debug(IWARNING, element_video);
     debugLog(IWARNING + "universalColorizeTime Count", count);
 
 }
@@ -844,7 +848,7 @@ function startColorizeTime(l) {
 document.us_vtc = {
     is_autoplay: false,
     zoom_14: ['4kporn.xxx', 'fapnfuck.com', 'b1gtits.com'],
-    zoom_12: ['www.analgalore.com', 'www.fuq.com', 'www.fucd.com'],
+    zoom_12: ['www.fuq.com', 'www.fucd.com'],
     is_xvideos: (window.location.host.indexOf('xvideos.com') > -1),
     is_redtube: (window.location.host == 'www.redtube.com'),
     is_xnxx: (window.location.host == 'www.xnxx.com'),
@@ -854,8 +858,9 @@ document.us_vtc = {
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
     is_groups_fuq: ['fuq.com', 'www.analgalore.com', 'www.findtubes.com'],
     is_hentaicity: (window.location.host.indexOf('hentaicity.com') > -1),
-    is_groups_global: ['pornloupe.com'],
-    is_groups_global_selector: ['.time-holder'],
+    is_groups_global: ['pornloupe.com', 'www.analgalore.com'],
+    is_groups_global_selector: ['.time-holder', "span.item-meta-container > span:nth-child(2)"],
+    is_groups_global_parent: [5, 3],
     fnColorizeTime: null,
     is_change_filter: true,
     on_apply_filter: false,
@@ -895,6 +900,7 @@ document.us_vtc = {
 
         if (me.is_groups_global) {
             me.is_groups_global_selector = me.is_groups_global_selector[me.is_groups_global_idx];
+            me.is_groups_global_parent = me.is_groups_global_parent[me.is_groups_global_idx];
             document.us_vtc.fnColorizeTime = universalColorizeTime;
         }
 
@@ -914,13 +920,24 @@ document.us_vtc = {
             me.video_container = document.querySelector("#content");
         }
 
-        document.us_vtc.addMenu();
-        document.us_vtc.loadFilter();
+        let embed = document.location.href.indexOf("/embed/") > -1;
 
+        if (!embed) {
+            document.us_vtc.addMenu();
+            document.us_vtc.loadFilter();
+        }
 
         if (document.us_vtc.is_xhamster) {
             document.get_xhamster_search();
             document.us_vtc.enlargeContains();
+
+            if (embed) {
+                let timer = setInterval(() => {
+                    let eml = document.querySelector("#player > div.xplayer-start-button");
+                    if (eml === null) return;
+                    eml.click();
+                }, 1000)
+            }
         }
         debugLog("STAR COLORIZE");
         document.us_vtc.fnColorizeTime();
@@ -1758,7 +1775,7 @@ document.pagevisited = {
     },
     cloneProcess: () => {
         let me = document.pagevisited;
-        me.bookmarks_remote = { ...me.bookmarks };
+        me.bookmarks_remote = {...me.bookmarks};
         me.endProcess();
     },
     tooltips: function () {
@@ -1870,14 +1887,15 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
 
 function fulls() {
 
-    
+
     const STYLE1 = "1200px !important";
     const STYLE2 = "1200px";
 
     let exlude = ['HTML', 'BODY', 'MAIN', 'SECTION'];
     let video = document.querySelector("video");
     let iframe = document.querySelector("iframe");
-    if (iframe != null) video = document.querySelector("iframe");;
+    if (iframe != null) video = document.querySelector("iframe");
+    ;
 
     video.style.width = STYLE1;
 
@@ -1894,8 +1912,6 @@ function fulls() {
         //node.style.width = STYLE1;
         video = video.parentNode;
     }
-
-
 
 
 }
