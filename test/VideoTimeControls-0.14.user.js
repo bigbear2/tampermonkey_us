@@ -817,10 +817,10 @@ document.us_vtc = {
             me.video_container = document.querySelector("#content");
         }
 
-        //let embed = document.location.href.indexOf("/embed/") > -1;
-        //let embed = document.location.href.indexOf("/embedframe/") > -1;
+        let embed_1 = document.location.href.indexOf("/embed/") > -1;
+        let embed_2 = document.location.href.indexOf("/embedframe/") > -1;
 
-        let embed = ["/embed/", "/embedframe/"].every(o => document.location.href.includes(o));
+        let embed = (embed_1 || embed_2);
         if (!embed) {
             document.us_vtc.addMenu();
             document.us_vtc.loadFilter();
