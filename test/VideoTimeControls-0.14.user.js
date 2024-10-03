@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.36
+// @version      0.37
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -75,58 +75,6 @@ document.mobileAndTabletCheck = function () {
 
 document.module_xhamster = {
     data: [],
-}
-
-function get_pornhub_info() {
-    debugLog("get_pornhub_info")
-
-    let data = {
-        "title": "",
-        "tags": [],
-        "categories": [],
-        "vote_up": 0,
-        "vote_down": 0,
-        "thumbnail": "",
-        "duration": "00:00:00",
-        "href": window.location.href,
-    }
-
-    //TITLE
-    data.title = document.title.replace(" - Pornhub.com", '').trim();
-
-
-    //TAGS
-    let categories = document.querySelectorAll("a[data-label='category']");
-    for (let category of categories) {
-        let text = category.innerText;
-        data.tags.push(text);
-    }
-
-
-    //TAGS
-    let items = document.querySelectorAll("a[data-label='tag']");
-    for (let tag of items) {
-        let text = tag.innerText;
-        data.tags.push(text);
-    }
-
-
-    //VOTE
-    let vote = document.querySelector(".votesUp");
-    if (vote !== null) data.vote_up = parseInt(vote.getAttribute("data-rating"));
-
-    vote = document.querySelector(".votesDown");
-    if (vote !== null) data.vote_down = parseInt(vote.getAttribute("data-rating"));
-
-
-    let image = document.querySelector("meta[property='og:image']")
-    if (image !== null) data.thumbnail = image.content;
-
-
-    let duration = document.querySelector("span.mgp_total")
-    if (duration !== null) data.duration = duration.innerText;
-
-    return data;
 };
 
 document.get_xhamster_search = function () {
@@ -158,57 +106,6 @@ document.set_xhamster_search = function () {
     console.debug(IOK, xhamster_search);
 
 
-}
-
-function get_xhamster_info() {
-    debugLog("get_xhamster_info")
-
-    let data = {
-        "title": "",
-        "tags": [],
-        "vote_up": 0,
-        "vote_down": 0,
-        "thumbnail": "",
-        "duration": "00:00:00",
-        "href": window.location.href,
-    }
-
-    //TITLE
-    let title = document.querySelector(".with-player-container > h1")
-    if (title !== null) data.title = title.innerText.trim()
-
-
-    //TAGS
-    let items = document.querySelectorAll("#video-tags-list-container > div > div > div > a");
-    for (let tag of items) {
-        let href = tag.href;
-        let text = tag.innerText;
-        if (!href.includes("/categories/")) continue;
-        let a_href = href.split("/");
-        text = a_href[a_href.length - 1];
-        data.tags.push(text);
-    }
-
-
-    //VOTE
-    let vote = document.querySelector(".rb-new__info")
-    if (vote !== null) {
-        let a_vote = vote.innerText.split(" / ");
-        data.vote_up = parseInt(a_vote[0]);
-        data.vote_down = parseInt(a_vote[1]);
-    }
-
-
-    let image = document.querySelector(".xp-preload-image")
-    if (image !== null) {
-        image = image.style.backgroundImage
-        data.thumbnail = image.split('"')[1];
-    }
-
-    let duration = document.querySelector(".eta")
-    if (duration !== null) data.duration = duration.innerText;
-
-    return data;
 };
 
 
@@ -920,8 +817,10 @@ document.us_vtc = {
             me.video_container = document.querySelector("#content");
         }
 
-        let embed = document.location.href.indexOf("/embed/") > -1;
+        //let embed = document.location.href.indexOf("/embed/") > -1;
+        //let embed = document.location.href.indexOf("/embedframe/") > -1;
 
+        let embed = ["/embed/", "/embedframe/"].every(o => document.location.href.includes(o));
         if (!embed) {
             document.us_vtc.addMenu();
             document.us_vtc.loadFilter();
