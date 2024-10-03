@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.12
+// @version      0.13
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
@@ -310,6 +310,32 @@ document.toast = {
 
 };
 
+function globalScript() {
+    let data_hentaiworlds = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAOVBMVEVHcEzdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybdHybuAAD+AAAAEnRSTlMA7DZrX0q2zCIYCYjX9al2msOvWQCwAAAAw0lEQVQokW2SiQ6EIAxEy1G55LD//7E7COu6yoQY6EsHMpXoUtQt0ltRbyK5hmddJyWCddj/rrSLOMMtSy78K/MhIjt3v4K+Nv08zCHnxwm9ypy7Q3LiCQI+GqjbhU0s2QmqJE3BvYGBJ/kH6FfaBVBbKcUtwKUXUFBe3aFDCHUFlq/SaglqT/cG9i8Qh6zPuDvgPCJB5phDGYmakaemb76YQ+1WqZfrbVAWfrvpY7ymMRUMwsZqTE952Dhe/ScUza38AebxDwlUPzLaAAAAAElFTkSuQmCC';
+    if (window.location.href.indexOf("anidb.net/anime/") > -1) {
+        let elm = document.querySelector("h1.anime");
+        if (elm !== null) {
+            let title = elm.innerHTML;
+            title = title.replace("Anime: ", "").trim();
+            let html = '&nbsp;<a target="_blank" href="https://www.hentaiworld.me/search?keyword=' + encodeURIComponent(title) + '">[<img src="' + data_hentaiworlds + '"/>]</a>';
+            console.debug(html, 'https://www.hentaiworld.me/search?keyword=' + encodeURIComponent(title));
+            elm.innerHTML += html;
+        }
+
+        let collection = document.querySelectorAll("td.name.main.anime > a");
+        for (let i = 0; i < collection.length; i++) {
+            let elm = collection[i].parentNode;
+            let title = collection[i].innerHTML;
+
+            let html = '&nbsp;<a target="_blank" href="https://www.hentaiworld.me/search?keyword=' + encodeURIComponent(title) + '">[<img src="' + data_hentaiworlds + '"/>]</a>';
+            console.debug(html, 'https://www.hentaiworld.me/search?keyword=' + encodeURIComponent(title));
+            elm.innerHTML += html;
+        }
+    }
+
+}
+
+
 function trustedTypesInit() {
     let sec = document.querySelector("#trustedTypes");
     if (sec !== null) return;
@@ -331,8 +357,12 @@ function trustedTypesInit() {
     metaElement.setAttribute("content", "trusted-types test");
 
     'use strict';
-    metaElement.innerHTML = window.trustedTypes.defaultPolicy.createHTML("");
-    document.head.appendChild(metaElement);
+    try {
+        metaElement.innerHTML = window.trustedTypes.defaultPolicy.createHTML("");
+        document.head.appendChild(metaElement);
+    } catch (e) {
+        return;
+    }
 }
 
 (async function () {
@@ -346,6 +376,8 @@ function trustedTypesInit() {
 
         document.userscript_global.getBootstrapVersion();
         document.userscript_global.log("GLOBAL FUNCTION", "BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
+
+        globalScript();
 
     }, false);
 
