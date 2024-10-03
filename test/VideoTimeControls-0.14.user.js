@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.37
+// @version      0.38
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        http://*
@@ -835,7 +835,8 @@ document.us_vtc = {
                     let eml = document.querySelector("#player > div.xplayer-start-button");
                     if (eml === null) return;
                     eml.click();
-                }, 1000)
+                    clearInterval(timer);
+                }, 500)
             }
         }
         debugLog("STAR COLORIZE");
