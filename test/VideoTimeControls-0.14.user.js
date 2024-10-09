@@ -1,13 +1,19 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.38
+// @version      0.39
 // @description  VideoTimeControls
 // @author       bigbear2sfc
-// @match        http://*
-// @match        https://*
-// @include      http://*
-// @include      https://*
+// @match        https://spankbang.com/*
+// @match        https://www.analgalore.com/*
+// @match        https://www.eporner.com/*
+// @match        https://www.findtubes.com/*
+// @match        https://www.fuq.com/*
+// @match        https://www.pornhub.com/*
+// @match        https://www.redtube.com/*
+// @match        https://www.xnxx.com/*
+// @match        https://www.xvideos.com/*
+// @match        https://xhamster.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lovenselife.com
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @grant        GM_setValue
@@ -24,7 +30,7 @@ const emoji_info = "ℹ️ℹ️";
 var is_initialize = false;
 var element_video = [];
 var universal_parent_count = 5;
-const time_colors = ['white', '#FFFF00', '#00FF00', '#00FFFF', '#FF00FF'];
+const time_colors = ['white', 'white', '#FFFF00', '#00FF00', '#00FFFF', '#FF00FF'];
 
 /*
 console.log('📕: error message');
@@ -37,7 +43,7 @@ console.log('📔: Or anything you like and want to recognize immediately by col
 
 const IOK = '📗';
 const IERROR = '📕';
-const IWARNING = '📙';
+const IWARNING = '📘';
 
 function errorLog(...args) {
     console.debug('📙 ERROR', args);
@@ -110,8 +116,8 @@ document.set_xhamster_search = function () {
 
 
 const elementIsVisibleInViewport = (el, partiallyVisible = false) => {
-    const {top, left, bottom, right} = el.getBoundingClientRect();
-    const {innerHeight, innerWidth} = window;
+    const { top, left, bottom, right } = el.getBoundingClientRect();
+    const { innerHeight, innerWidth } = window;
     return partiallyVisible
         ? ((top > 0 && top < innerHeight) ||
             (bottom > 0 && bottom < innerHeight)) &&
@@ -160,15 +166,16 @@ function typeTime(value, split = true) {
         }
     }
     min = parseInt(min);
-    if (min >= 0 && min < 10) return 0;
-    if (min >= 10 && min < 20) return 1;
-    if (min >= 20 && min < 30) return 2;
-    if (min >= 30) return 3;
+    if (min >= 0 && min < 5) return 0;
+    if (min >= 5 && min < 10) return 1;
+    if (min >= 10 && min < 20) return 2;
+    if (min >= 20 && min < 30) return 3;
+    if (min >= 30) return 4;
     return 4;
 }
 
 function spankbangColorizeTime() {
-    debugLog("spankbangColorizeTime");
+    //debugLog("spankbangColorizeTime");
     const collection = document.querySelectorAll(".video-badge");
     for (let i = 0; i < collection.length; i++) {
         try {
@@ -217,7 +224,7 @@ function spankbangColorizeTime() {
 }
 
 function hentaicityColorizeTime() {
-    debugLog("hentaicityColorizeTime");
+    //debugLog("hentaicityColorizeTime");
     const collection = document.querySelectorAll(".time");
     for (let i = 0; i < collection.length; i++) {
         try {
@@ -254,7 +261,7 @@ function hentaicityColorizeTime() {
 }
 
 function epornerColorizeTime() {
-    debugLog("epornerColorizeTime");
+    //debugLog("epornerColorizeTime");
     const collection = document.querySelectorAll(".mbtim");
     for (let i = 0; i < collection.length; i++) {
         try {
@@ -291,7 +298,7 @@ function epornerColorizeTime() {
 }
 
 function redtubeColorizeTime() {
-    debugLog("redtubeColorizeTime");
+    //debugLog("redtubeColorizeTime");
     const collection = document.querySelectorAll(".tm_video_duration");
     for (let i = 0; i < collection.length; i++) {
         try {
@@ -364,17 +371,13 @@ function xvideosColorizeTime() {
             item.classList.add("us-watched-min-" + t_time.toString());
             element_video.push(record);
 
-            if (item.innerHTML.indexOf("pv-visited") > -1) {
-                if (item.tagName === "BODY") continue;
-                if (item.classList.contains("us-watched")) continue;
-                item.style.opacity = 0.5;
-                item.classList.add("us-watched");
+            if (!elm.classList.contains("us-video-min-global")) {
+                elm.classList.add("us-video-min-global");
+                elm.classList.add("us-video-min-" + t_time.toString());
             }
-
-            if (elm.style.fontSize === "20px") continue;
-
+            /* if (elm.style.fontSize === "20px") continue;
             elm.style.fontSize = "20px";
-            elm.style.color = time_colors[t_time];
+            elm.style.color = time_colors[t_time]; */
 
             marked++;
 
@@ -383,16 +386,11 @@ function xvideosColorizeTime() {
         }
 
     }
-    if (marked > 0) debugLog("xvideosColorizeTime", marked);
 
-    /*     for (let i = 0; i < element_video.length; i++) {
-            let item = element_video[i];
-
-        } */
 }
 
 function xnxxColorizeTime() {
-    debugLog("xnxxColorizeTime");
+    //debugLog("xnxxColorizeTime");
     const collection = document.querySelectorAll("p.metadata");
     for (let i = 0; i < collection.length; i++) {
         try {
@@ -437,7 +435,7 @@ function xnxxColorizeTime() {
 }
 
 function fuqColorizeTime() {
-    debugLog("fuqColorizeTime");
+    //debugLog("fuqColorizeTime");
     const collection = document.querySelectorAll(".duration-300 > span");
 
 
@@ -517,14 +515,21 @@ function xHamsterColorizeTime() {
         let t_time = typeTime(time);
         elm = elm.firstChild;
 
-        if (elm.style.fontSize === "20px") continue;
+        if (!elm.classList.contains("us-video-min-global")) {
+            elm.classList.add("us-video-min-global");
+            elm.classList.add("us-video-min-" + t_time.toString());
+        }else{
+            continue;
+        }
+
+
+        //if (elm.style.fontSize === "20px") continue;
 
         items_count++;
-        elm.style.color = time_colors[t_time];
-
+        /* elm.style.color = time_colors[t_time];
+        elm.style.fontSize = "20px"; */
         item.classList.add("us-watched-min-" + t_time.toString());
-        elm.style.fontSize = "20px";
-
+        
 
         try {
             elm = elm.parentElement.parentElement.parentElement;
@@ -557,7 +562,7 @@ function xHamsterColorizeTime() {
 }
 
 function durationColorizeTime() {
-    debugLog("durationColorizeTime");
+    //debugLog("durationColorizeTime");
     let count = 0;
 
     const collection = document.getElementsByClassName("duration");
@@ -607,17 +612,24 @@ function durationColorizeTime() {
 
         elm.style.color = time_colors[t_time];
         item.classList.add("us-watched-min-" + t_time.toString());
-        elm.style.fontSize = "20px";
+        
+        if (!elm.classList.contains("us-video-min-global")) {
+            elm.classList.add("us-video-min-global");
+            elm.classList.add("us-video-min-" + t_time.toString());
+        } else {
+            continue;
+        }
 
-        elm.style.fontSize = "20px";
+        /* elm.style.fontSize = "20px";
         elm.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
         elm.style.padding = '4px';
-        elm.style.borderRadius = '6px';
+        elm.style.borderRadius = '6px'; */
 
         if (document.us_vtc.is_pornhub) {
-            elm.style.width = "100px";
-            elm.style.textAlign = "center";
-            elm.style.transform = 'scale(1.3,1.3)';
+            elm.setAttribute("style", "font-size: 18px!important;width: 80px;text-align: center;");
+            //elm.style.width = "90px";
+            //elm.style.textAlign = "center";
+            //elm.style.transform = 'scale(1.2,1.2)';
 
             let iText = item.innerText;
             if (iText.includes("WATCHED")) {
@@ -634,7 +646,7 @@ function universalColorizeTime() {
 
     let count = 0;
     let selectorID = document.us_vtc.is_groups_global_selector;
-    debugLog(IWARNING + "universalColorizeTime", selectorID);
+    //debugLog(IWARNING + "universalColorizeTime", selectorID);
 
     const collection = document.querySelectorAll(selectorID);
     for (let i = 0; i < collection.length; i++) {
@@ -666,7 +678,14 @@ function universalColorizeTime() {
 
         } catch (error) {
             errorLog("ERRORE timeToSeconds", error);
-            return;
+            continue;
+        }
+
+        if (!elm.classList.contains("us-video-min-global")) {
+            elm.classList.add("us-video-min-global");
+            elm.classList.add("us-video-min-" + t_time.toString());
+        } else {
+            continue;
         }
 
         item = elm;
@@ -679,60 +698,20 @@ function universalColorizeTime() {
         }
         element_video.push(record);
 
-        elm.style.color = time_colors[t_time];
         item.classList.add("us-watched-min-" + t_time.toString());
-        elm.style.fontSize = "20px";
 
+        /* elm.style.color = time_colors[t_time];            
         elm.style.fontSize = "20px";
         elm.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
         elm.style.padding = '4px';
-        elm.style.borderRadius = '6px';
+        elm.style.borderRadius = '6px'; */
 
     }
-    console.debug(IWARNING, element_video);
-    debugLog(IWARNING + "universalColorizeTime Count", count);
+    //console.debug(IWARNING, element_video);
+    //debugLog(IWARNING + "universalColorizeTime Count", count);
 
 }
 
-document.onClickLinkPageVisited = () => {
-    console.debug("BOOOOOOOOOOOOO", this);
-}
-
-document.onClickPageVisited = () => {
-    return;
-    let count = 0;
-
-    const collection = document.querySelectorAll("a");
-    for (let i = 0; i < collection.length; i++) {
-
-        let elm = collection[i];
-        if (elm == undefined || elm == null) continue;
-
-
-        let href = elm.href;
-        let title = elm.innerText.toString();
-
-        if (href == "#" || href == "#PV") continue;
-        elm.setAttribute("furl", href);
-        elm.href = "javascript:document.onClickLinkPageVisited();";
-        elm.addEventListener("click", (ref) => {
-            debugLog(IOK + "CLIKKKKK", ref.target);
-            removeEventListener(elm, "click");
-
-            href = elm.href;
-            title = elm.innerText.toString();
-            document.pagevisited.execute(title, href);
-
-
-            let me = ref.target;
-            me.href = me.getAttribute("furl");
-            setTimeout(() => me.click(), 1500);
-        });
-        count++;
-    }
-
-    debugLog(IWARNING + "onClickPageVisited", count);
-}
 
 
 function startColorizeTime(l) {
@@ -753,7 +732,7 @@ document.us_vtc = {
     is_xhamster: (window.location.host.indexOf('xhamster.') > -1),
     is_eporner: (window.location.host.indexOf('.eporner.com') > -1),
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
-    is_groups_fuq: ['fuq.com', 'www.analgalore.com', 'www.findtubes.com'],
+    is_groups_fuq: ['www.fuq.com', 'www.analgalore.com', 'www.findtubes.com'],
     is_hentaicity: (window.location.host.indexOf('hentaicity.com') > -1),
     is_groups_global: ['pornloupe.com', 'www.analgalore.com'],
     is_groups_global_selector: ['.time-holder', "span.item-meta-container > span:nth-child(2)"],
@@ -762,6 +741,7 @@ document.us_vtc = {
     is_change_filter: true,
     on_apply_filter: false,
     is_init: false,
+    filter_duration_elm_0: null,
     filter_duration_elm_1: null,
     filter_duration_elm_2: null,
     filter_duration_elm_3: null,
@@ -770,7 +750,7 @@ document.us_vtc = {
     video_container: null,
     video_container_class: false,
     init: () => {
-        debugLog("us_vtc INIT", document.us_vtc.is_init);
+        //debugLog("us_vtc INIT", document.us_vtc.is_init);
         let me = document.us_vtc;
         if (document.us_vtc.is_init) return;
         document.us_vtc.is_init = true;
@@ -791,9 +771,6 @@ document.us_vtc = {
         if (me.is_groups_fuq) document.us_vtc.fnColorizeTime = fuqColorizeTime;
         if (document.us_vtc.is_spankbang) document.us_vtc.fnColorizeTime = spankbangColorizeTime;
 
-        if (me.is_groups_fuq) {
-            setTimeout(() => document.onClickPageVisited(), 1500);
-        }
 
         if (me.is_groups_global) {
             me.is_groups_global_selector = me.is_groups_global_selector[me.is_groups_global_idx];
@@ -805,8 +782,8 @@ document.us_vtc = {
         let host = window.location.host;
         let body = document.querySelector("body");
         if (!document.mobileAndTabletCheck()) {
-            if (me.zoom_14.includes(host)) body.style.zoom = "1.2";
-            if (me.zoom_12.includes(host)) body.style.zoom = "1.2";
+            //if (me.zoom_14.includes(host)) body.style.zoom = "1.2";
+            //if (me.zoom_12.includes(host)) body.style.zoom = "1.2";
         }
 
         me.autoplay();
@@ -824,27 +801,19 @@ document.us_vtc = {
         if (!embed) {
             document.us_vtc.addMenu();
             document.us_vtc.loadFilter();
-        }
+        } 
 
         if (document.us_vtc.is_xhamster) {
             document.get_xhamster_search();
             document.us_vtc.enlargeContains();
-
-            if (embed) {
-                let timer = setInterval(() => {
-                    let eml = document.querySelector("#player > div.xplayer-start-button");
-                    if (eml === null) return;
-                    eml.click();
-                    clearInterval(timer);
-                }, 500)
-            }
         }
-        debugLog("STAR COLORIZE");
+
+        if (embed) return;
+
+        //debugLog("STAR COLORIZE");
         document.us_vtc.fnColorizeTime();
 
-
         document.us_vtc.applyFilter();
-        //document.us_vtc.applyFilter();
         setInterval(() => {
             document.us_vtc.applyFilter();
         }, 10000)
@@ -877,7 +846,7 @@ document.us_vtc = {
                         me.video_container.classList.add("us_vtc_show_video");
                     }
                 }
-                debugLog("SCROOL END", visible, me.video_container_class);
+                //debugLog("SCROOL END", visible, me.video_container_class);
             });
 
         }
@@ -898,7 +867,7 @@ document.us_vtc = {
                     font-size: 14px !important;
                     border-radius: 0 5px 5px 0;
                     z-index: 99999;
-                    right: -130px;
+                    left: -145px;
                     bottom: 30%;
                     opacity: 0.4;
                     filter: alpha(opacity=30);
@@ -911,7 +880,7 @@ document.us_vtc = {
                     opacity: 1.0;
                     filter: alpha(opacity=100);
                     transition: 0.3s;
-                    right: 0px;
+                    left: 0px;
                 }
 
                 #us_vtc_filter > form > label {
@@ -937,6 +906,32 @@ document.us_vtc = {
                     right: 10px!important;
                     z-index: 999999!important;
                 }
+
+                .us-video-min-global {
+                    margin-top: -5px !important;
+                    background-color: rgba(0, 0, 0, 0.7) !important;
+                    font-size: 18px !important;
+                    padding: 4px !important;
+                    border-radius: 3px !important;
+                }
+                .us-video-min-0{
+                    color: white !important;
+                }
+                .us-video-min-1{
+                    color: rgb(216, 240, 84) !important;
+                }
+                .us-video-min-2{
+                    color: rgb(89, 241, 84) !important;
+                }
+                .us-video-min-3{
+                    color: rgb(247, 104, 104) !important;
+                }
+                .us-video-min-4{
+                    color: rgb(52, 240, 199) !important;
+                }
+                .us-video-min-5{
+                    color: rgb(89, 74, 228) !important;
+                }
             </style>`;
 
         document.head.insertAdjacentHTML("beforeend", obj_css);
@@ -944,31 +939,36 @@ document.us_vtc = {
         let obj_html = `
            <div id="us_vtc_filter">
                 <form action="#">
-                    <input type="checkbox" id="us_vtc_filter_op_1" class="us_vtc_filter" name="us_vtc_filter_op_1" value="0"
+                    <input type="checkbox" id="us_vtc_filter_op_0" class="us_vtc_filter" name="us_vtc_filter_op_0" value="0"
                            checked>
-                    <label for="us_vtc_filter_op_1">Show 0 < 10 Min</label><br>
+                    <label for="us_vtc_filter_op_0">Show 0 < 5 Min</label><br>
 
-                    <input type="checkbox" id="us_vtc_filter_op_2" class="us_vtc_filter" name="us_vtc_filter_op_2" value="1"
+                    <input type="checkbox" id="us_vtc_filter_op_1" class="us_vtc_filter" name="us_vtc_filter_op_1" value="1"
+                           checked>
+                    <label for="us_vtc_filter_op_1">Show 5 < 10 Min</label><br>
+
+                    <input type="checkbox" id="us_vtc_filter_op_2" class="us_vtc_filter" name="us_vtc_filter_op_2" value="2"
                            checked>
                     <label for="us_vtc_filter_op_2">Show 10 < 20 Min</label><br>
 
-                    <input type="checkbox" id="us_vtc_filter_op_3" class="us_vtc_filter" name="us_vtc_filter_op_3" value="2"
+                    <input type="checkbox" id="us_vtc_filter_op_3" class="us_vtc_filter" name="us_vtc_filter_op_3" value="3"
                            checked>
                     <label for="us_vtc_filter_op_3">Show 20 < 30 Min</label><br>
 
-                    <input type="checkbox" id="us_vtc_filter_op_4" class="us_vtc_filter" name="us_vtc_filter_op_4" value="3"
+                    <input type="checkbox" id="us_vtc_filter_op_4" class="us_vtc_filter" name="us_vtc_filter_op_4" value="4"
                            checked>
                     <label for="us_vtc_filter_op_4">Show > 30 Min</label><br>
 
-                    <input type="checkbox" id="us_vtc_filter_op_5" class="us_vtc_filter" name="us_vtc_filter_op_5" value="4"
+                    <input type="checkbox" id="us_vtc_filter_op_5" class="us_vtc_filter" name="us_vtc_filter_op_5" value="10"
                            checked>
                     <label for="us_vtc_filter_op_5">Show Watched</label><br><br>
-                    <button type="button" value="5" class="us_vtc_filter">Search Title</button>
-                    <button type="button" value="6" class="us_vtc_filter">Search Similar</button>
-                    <button type="button" value="7" class="us_vtc_filter">Search Tags</button>
-                    <button type="button" value="8" class="us_vtc_filter">NOISE</button>
-                    <button type="button" value="9" class="us_vtc_filter">Colorize</button>
-                    <button type="button" value="10" class="us_vtc_filter">Close</button>
+
+                    <button type="button" value="11" class="us_vtc_filter">Search Title</button>
+                    <button type="button" value="12" class="us_vtc_filter">Search Similar</button>
+                    <button type="button" value="13" class="us_vtc_filter">Search Tags</button>
+                    <button type="button" value="14" class="us_vtc_filter">NOISE</button>
+                    <button type="button" value="15" class="us_vtc_filter">Colorize</button>
+                    <button type="button" value="16" class="us_vtc_filter">Close</button>
                 </form>
             </div>`;
 
@@ -978,19 +978,22 @@ document.us_vtc = {
         const checkboxes = document.querySelectorAll(".us_vtc_filter");
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].addEventListener("click", (evt) => {
-                debugLog("CHECKBOX FILTER CLICK", evt);
+                //debugLog("CHECKBOX FILTER CLICK", evt);
                 document.us_vtc.filter(evt);
             });
         }
 
+        document.us_vtc.filter_duration_elm_0 = document.querySelector("#us_vtc_filter_op_0");
         document.us_vtc.filter_duration_elm_1 = document.querySelector("#us_vtc_filter_op_1");
         document.us_vtc.filter_duration_elm_2 = document.querySelector("#us_vtc_filter_op_2");
         document.us_vtc.filter_duration_elm_3 = document.querySelector("#us_vtc_filter_op_3");
         document.us_vtc.filter_duration_elm_4 = document.querySelector("#us_vtc_filter_op_4");
+
         document.us_vtc.filter_watched_elm = document.querySelector("#us_vtc_filter_op_5");
     },
     saveFilter: () => {
         let data = {
+            "filter_duration_elm_0": document.us_vtc.filter_duration_elm_0.checked,
             "filter_duration_elm_1": document.us_vtc.filter_duration_elm_1.checked,
             "filter_duration_elm_2": document.us_vtc.filter_duration_elm_2.checked,
             "filter_duration_elm_3": document.us_vtc.filter_duration_elm_3.checked,
@@ -1000,7 +1003,7 @@ document.us_vtc = {
 
         GM_setValue('us_xht', JSON.stringify(data));
 
-        //debugLog("saveFilter:", data);
+        ////debugLog("saveFilter:", data);
         document.us_vtc.is_change_filter = true;
     },
     loadFilter: () => {
@@ -1008,6 +1011,7 @@ document.us_vtc = {
         let value = GM_getValue('us_xht', null);
         if (value === null) {
             value = {
+                "filter_duration_elm_0": true,
                 "filter_duration_elm_1": true,
                 "filter_duration_elm_2": true,
                 "filter_duration_elm_3": true,
@@ -1017,8 +1021,9 @@ document.us_vtc = {
         }
         try {
             value = JSON.parse(value);
-            //debugLog("loadFilter:", value);
+            ////debugLog("loadFilter:", value);
 
+            document.us_vtc.filter_duration_elm_0.checked = value.filter_duration_elm_0;
             document.us_vtc.filter_duration_elm_1.checked = value.filter_duration_elm_1;
             document.us_vtc.filter_duration_elm_2.checked = value.filter_duration_elm_2;
             document.us_vtc.filter_duration_elm_3.checked = value.filter_duration_elm_3;
@@ -1038,6 +1043,7 @@ document.us_vtc = {
         document.us_vtc.is_change_filter = false;
 
         document.us_vtc.on_apply_filter = true;
+        document.us_vtc.filter_duration_elm_0.dispatchEvent(new Event('click'));
         document.us_vtc.filter_duration_elm_1.dispatchEvent(new Event('click'));
         document.us_vtc.filter_duration_elm_2.dispatchEvent(new Event('click'));
         document.us_vtc.filter_duration_elm_3.dispatchEvent(new Event('click'));
@@ -1045,7 +1051,7 @@ document.us_vtc = {
         document.us_vtc.filter_watched_elm.dispatchEvent(new Event('click'));
         document.us_vtc.on_apply_filter = false;
 
-        debugLog("applyFilter executed:");
+        //debugLog("applyFilter executed:");
     },
     filter: (evt) => {
         let elm = evt.target;
@@ -1054,25 +1060,25 @@ document.us_vtc = {
         //debug("FILTER", value, checked);
 
         switch (value) {
-            case "4":
+            case "10":
                 document.us_vtc.viewWatchedVideos(checked);
                 break;
-            case "5":
+            case "11":
                 document.us_vtc.searchTitle();
                 break;
-            case "6":
+            case "12":
                 document.us_vtc.searchSimilar();
                 break;
-            case "7":
+            case "13":
                 document.us_vtc.searchTags();
                 break;
-            case "8":
+            case "14":
                 document.us_vtc.hideNoise();
                 break;
-            case "9":
+            case "15":
                 document.us_vtc.fnColorizeTime();
                 break;
-            case "10":
+            case "16":
                 let elm = document.querySelector("#us_vtc_filter");
                 elm.remove();
                 break;
@@ -1108,6 +1114,7 @@ document.us_vtc = {
             meta = meta.toLowerCase();
         } catch (e) {
             alert("No Found Meta Description");
+            return;;
         }
 
         let idx = meta.indexOf("video on xhamster");
@@ -1145,7 +1152,7 @@ document.us_vtc = {
         //debug("US XHS", "INJ BUTTON SUCCESS")
     },
     viewWatchedVideos: (visible) => {
-        debugLog("viewWatchedVideos", visible);
+        //debugLog("viewWatchedVideos", visible);
         let collection = document.querySelectorAll(".us-watched");
         for (let i = 0; i < collection.length; i++) {
             if (collection[i].tagName === "BODY") continue;
@@ -1157,6 +1164,7 @@ document.us_vtc = {
     },
     viewVideosDuration: (idx, visible) => {
         debugLog("viewVideosDuration", idx, visible);
+        if (parseInt(idx) > 5) return;
 
         let collection = document.querySelectorAll(".us-watched-min-" + idx);
         for (let i = 0; i < collection.length; i++) {
@@ -1216,7 +1224,7 @@ document.us_vtc = {
     },
     autoplay: () => {
         let me = document.us_vtc;
-        console.debug("AUTOPLAY", me.is_autoplay);
+        //console.debug("AUTOPLAY", me.is_autoplay);
 
         if (me.is_autoplay) return;
 
@@ -1227,7 +1235,7 @@ document.us_vtc = {
             btn = "#player > div.cover";
             video_click = true;
         }
-        if (host === 'xhamster.com') btn = "#player-container > div.xplayer-start-button";
+        //if (host === 'xhamster.com') btn = "#player-container > div.xplayer-start-button";
         if (host === 'www.xvideos.com') btn = "#anc-tst-play-btn";
 
         if (btn === null) return;
@@ -1255,7 +1263,7 @@ document.us_vtc = {
     removeBanner: () => {
         let banner;
 
-        debugLog("removeBanner");
+        //debugLog("removeBanner");
 
         if (document.us_vtc.is_xnxx) {
             banner = document.querySelector(".premium-results-line")
@@ -1409,345 +1417,9 @@ document.us_vtc = {
 }
 
 
-document.pagevisited = {
-    update: false,
-    added_href: false,
-    pages: [],
-    is_init: false,
-    bookmarks: [],
-    bookmarks_remote: [],
-    remote_js: "",
-    remote_css: "",
-    notify_ready: false,
-    last_record: null,
-    init: function () {
-        let me = document.pagevisited;
-        if (document.pagevisited.is_init) return;
-        document.pagevisited.is_init = true
-
-
-        let css = `
-            .toast-error{
-                color: white;
-                text-shadow: 4px 3px 0 #7A7A7A;
-                background: linear-gradient(to bottom,  #ff3019 0%,#cf0404 100%);
-            }
-            .toast-info{
-                color: white;
-                text-shadow: 4px 3px 0 #7A7A7A;
-                /*background: linear-gradient(to bottom,  #87e0fd 0%,#53cbf1 40%,#05abe0 100%);*/
-                background: linear-gradient(90deg, #1f005c, #260d71, #2c1b87, #30299d, #3136b5, #3045cd, #2a53e6, #1962ff);
-            }
-            .visited-link{
-                border: 20px solid #d250ff! important;
-                background: #454545! important;
-                color: white! important;
-            }
-
-            .pv-info-hide{
-                display:none;
-            }
-            #pv-info {
-                position: fixed;
-                bottom: 4px;
-                background: crimson;
-                line-height: 2;
-                text-align: center;
-                color: white;
-                font-size: 13px;
-                font-family: sans-serif;
-                font-weight: bold;
-                z-index: 99999;
-                left: -90px;
-                padding: 6px;
-                opacity: 0.5;
-                filter: alpha(opacity=50);
-                transition: 0.3s;
-            }
-
-            #pv-info:hover{
-                opacity: 1;
-                filter: alpha(opacity=100);
-                transition: 0.3s;
-                left: 4px;
-            }
-
-            tooltip {
-                position: fixed;
-                background: #fff;
-                color: #333;
-                border: 2px solid #333;
-                font-size: 15px;
-            }
-        `;
-
-        GM_addStyle(css);
-
-
-        let obj_css = `<div id="pv-info" class="pv-info-hide" onclick="document.querySelector('#pv-info').remove();" style='cursor: pointer;'>VISITED</div>`;
-        document.body.insertAdjacentHTML("beforeend", obj_css);
-
-        me.startProcess();
-
-
-        //infoLog(document.pagevisited.bookmarks);
-        return;
-
-        try {
-
-            let collection = document.querySelectorAll("a");
-            for (let i = 0; i < collection.length; i++) {
-                let object = collection[i];
-                object.addEventListener("click", (ref) => {
-                    debugLog("CLIKKKKK", ref);
-                });
-            }
-            ;
-
-
-        } catch (error) {
-            errorLog('pageVisited', 'ERRORE', error.message);
-        }
-    },
-    notify: function (message, _duration = 10000, error = true) {
-        document.toast.notify(message, _duration, (error) ? document.toast.T_ERROR : document.toast.T_NORMAL);
-
-    },
-    exist: function (href) {
-        for (let i = 0; i < document.pagevisited.bookmarks.length; i++) {
-            let elm = document.pagevisited.bookmarks[i];
-            if (href === elm.href) {
-                return elm.last_view;
-            }
-        }
-        ;
-        return "";
-    },
-    remoteExist: function (href) {
-        let me = document.pagevisited;
-        for (let i = 0; i < me.bookmarks_remote.length; i++) {
-            if (href === me.bookmarks_remote[i].href) return item;
-        }
-        return null;
-    },
-    execute: function (title, href) {
-        let me = document.pagevisited;
-        document.pagevisited.init();
-
-        let added = false;
-        let last_view = null;
-        let index = -1;
-        let adesso = Date.now();
-        adesso = document.userscript_global.italianTimeFormat(adesso);
-
-
-        let min = 10 * 60000;
-        setTimeout(function () {
-            document.pagevisited.update = false;
-        }, min);
-
-        if (document.pagevisited.added_href) return;
-        if (document.pagevisited.update) return;
-        document.pagevisited.update = true;
-
-        document.pagevisited.bookmarks.forEach((element, idx) => {
-            //debug(element);
-            if (href === element.href) {
-                added = true;
-                last_view = element.last_view;
-                index = idx;
-                return;
-            }
-        });
-
-        if (added) {
-            try {
-                document.pagevisited.notify('VISITATO: ' + last_view);
-                let element = document.querySelector("#pv-info");
-                element.innerHTML = "&#10006; VISITATO:<br>" + last_view;
-                element.classList.remove("pv-info-hide");
-
-
-            } catch (error) {
-                errorLog('pageVisited', 'ERRORE', error.message);
-            }
-            debugLog('pageVisited', 'VISITATO', last_view);
-            document.pagevisited.bookmarks[index].last_view = adesso;
-        } else {
-            let elm = {
-                "title": title,
-                "href": href,
-                "last_view": adesso,
-            }
-            document.pagevisited.bookmarks.push(elm);
-            //if (me.bookmarks_remote !== null) me.bookmarks_remote.push(elm);
-
-
-            debugLog('pageVisited', 'AGGIUNTO');
-            document.pagevisited.added_href = true;
-            document.pagevisited.notify('AGGIUNTO', 5000, false);
-        }
-
-        me.endProcess();
-        return;
-
-        setTimeout(() => {
-            let collection = document.querySelectorAll("a");
-            collection.forEach((element) => {
-                if (element.classList.contains("pv-visited")) return;
-
-                let hint = element.getAttribute("title");
-                let view = document.pagevisited.exist(element.href);
-
-                if (hint === null) {
-                    hint = "📒 " + element.href;
-                    element.setAttribute("title", hint);
-                }
-
-                if (hint.indexOf("VISITATO") === -1) {
-
-                    if (view !== "") {
-
-                        hint = "📘 VISITATO: " + view + " - " + hint;
-                        element.setAttribute("title", hint);
-                        element.setAttribute("tooltip", hint);
-                        element.classList.add("pv-visited");
-                    }
-                }
-                //debug("ELEMENT VISITED", element.href, view);
-
-            })
-
-
-            try {
-                document.pagevisited.tooltips();
-            } catch (error) {
-                errorLog('pageVisited', 'tooltips', error.message);
-            }
-
-
-        }, 1000);
-    },
-    startProcess: () => {
-        let me = document.pagevisited;
-        let title = document.title;
-        let href = window.location.href;
-
-
-        document.pagevisited.bookmarks = GM_getValue("pageVisited", "[]");
-        document.pagevisited.bookmarks = JSON.parse(document.pagevisited.bookmarks);
-
-        try {
-            document.userscript_global.getValue("pageVisited", "[]", (json) => {
-                json = JSON.parse(json);
-                me.bookmarks_remote = json.data;
-                if (typeof me.bookmarks_remote === 'object' && !Array.isArray(me.bookmarks_remote) && me.bookmarks_remote !== null)
-                    me.bookmarks_remote = Object.values(me.bookmarks_remote);
-                //console.debug(IOK + 'PAVEVISITED', "GET VALUE", json, me.bookmarks_remote)
-                me.execute(title, href);
-            });
-        } catch (e) {
-            console.debug(IERROR + "PAVEVISITED", 'GET VALUE', e)
-            me.bookmarks_remote = null;
-            me.execute(title, href);
-        }
-    },
-    endProcess: () => {
-        let me = document.pagevisited;
-
-        setTimeout(() => {
-            let json = JSON.stringify(document.pagevisited.bookmarks);
-            GM_setValue("pageVisited", json)
-
-            try {
-                if (me.bookmarks_remote === null) return;
-                document.userscript_global.setValue("pageVisited", me.bookmarks_remote, (json) => {
-                    json = JSON.parse(json);
-                    me.bookmarks_remote = json.data;
-                    //console.debug(IOK + 'PAVEVISITED', "SET VALUE", json, me.bookmarks_remote)
-                });
-            } catch (e) {
-                console.debug(IERROR + "PAVEVISITED", 'SET VALUE', e)
-            }
-
-
-        }, 1000)
-    },
-    cloneProcess: () => {
-        let me = document.pagevisited;
-        me.bookmarks_remote = {...me.bookmarks};
-        me.endProcess();
-    },
-    tooltips: function () {
-
-
-        var a = document.getElementsByTagName('*'),
-            tip, text,
-            base = document.createElement('tooltip'); //Defining all objects
-
-        for (var x = 0; x < a.length; x++) { //I'm using "for" loop to get all "a" elements with attribute "tooltip".
-            a[x].onmouseover = function () {
-                text = this.getAttribute('tooltip');
-                tip = document.createTextNode(text);
-                if (text != null) {// Checking if tooltip is empty or not.
-                    base.innerHTML = '';
-                    base.appendChild(tip);
-                    if (document.getElementsByTagName('tooltip')[0]) {// Checking for any "tooltip" element
-                        document.getElementsByTagName('tooltip')[0].remove();// Removing old tooltip
-                    }
-                    base.style.top = (event.pageY + 20) + 'px';
-                    base.style.left = (event.pageX + 20) + 'px';
-                    document.body.appendChild(base);
-                }
-
-            };
-            a[x].onmouseout = function () {
-                try {
-                    document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
-                } catch (error) {
-
-                }
-
-            };
-        }
-    },
-    tooltipsElement: function (elm, text) {
-        var a = tip,
-            base = document.createElement('tooltip'); //Defining all objects
-
-
-        elm.onmouseover = function () {
-
-            tip = document.createTextNode(text);
-            if (text != null) {// Checking if tooltip is empty or not.
-                base.innerHTML = '';
-                base.appendChild(tip);
-                if (document.getElementsByTagName('tooltip')[0]) {// Checking for any "tooltip" element
-                    document.getElementsByTagName('tooltip')[0].remove();// Removing old tooltip
-                }
-                base.style.top = (event.pageY + 20) + 'px';
-                base.style.left = (event.pageX + 20) + 'px';
-                document.body.appendChild(base);
-            }
-
-        };
-        elm.onmouseout = function () {
-            try {
-                document.getElementsByTagName('tooltip')[0].remove();// Remove last tooltip
-            } catch (error) {
-
-            }
-        };
-
-    }
-
-};
 
 const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) {
     element_video = [];
-    document.pagevisited.is_init = false;
-    document.pagevisited.init();
-
     document.us_vtc.is_init = false;
     document.us_vtc.init();
 }, "q");
@@ -1757,25 +1429,23 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
 
     window.addEventListener('load', async function () {
 
-        document.pagevisited.startProcess();
+
         document.us_vtc.init();
 
         $(window).on('popstate', function () {
-            debugLog("VideoTimeControl", "popstate");
+            //debugLog("VideoTimeControl", "popstate");
         });
 
         window.addEventListener("pageshow", function (event) {
             let historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
             if (historyTraversal) {
-                document.pagevisited.startProcess();
+
                 document.us_vtc.init();
             }
         });
 
         document.onvisibilitychange = function () {
-            debugLog("PAGEVISITED", "onvisibilitychange", document.hidden);
             if (!document.hidden) {
-                document.pagevisited.startProcess();
                 document.us_vtc.autoplay();
             }
             document.us_vtc.init();
@@ -1784,34 +1454,36 @@ const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) 
     }, false);
 
 })();
+//https://www.analgalore.com/out/?l=
+//https://www.analgalore.com/out/?l=3AARbc4Wvzaoq2o5ZTZ6QmczdzJlAtlOaHR0cHM6Ly9zZXhwZXN0ZXIuY29tL3ZpZGVvLzQ2NjkyL2Vub3VnaC1pcy1hbHdheXMtYS1iaXQtbW9yZS8/dXRtX2NhbXBhaWduPXRmzQUDonRjAc0Jh6dwb3B1bGFyBdk0eyJhbGwiOiIiLCJvcmllbnRhdGlvbiI6InN0cmFpZ2h0IiwicHJpY2luZyI6ImZyZWUifc0H5M5nAbmtqGNhdGVnb3J5zRBgwA%3D%3D&c=20566c94&v=3&
 
-function fulls() {
+function isset(variable) {
+    return !(variable === undefined || variable === null)
+}
+
+function handleClick(event) {
 
 
-    const STYLE1 = "1200px !important";
-    const STYLE2 = "1200px";
+    console.log(event.target);
+    let elm = event.target;
+    let href = elm.href;
+    href = href.replace("https://www.analgalore.com/out/?l=", "");
+    console.log("PREE", href);
+    href = href.split("&")[0];
+    console.log("PREE 2", href);
+    href = atob(href);
+    console.log("AFTER", href);
+    event.preventDefault(); // Prevents the default action
+}
 
-    let exlude = ['HTML', 'BODY', 'MAIN', 'SECTION'];
-    let video = document.querySelector("video");
-    let iframe = document.querySelector("iframe");
-    if (iframe != null) video = document.querySelector("iframe");
-    ;
+function preventClickTagA() {
+    let collection = document.querySelectorAll("a");
+    for (let i = 0; i < collection.length; i++) {
+        let elm = collection[i];
 
-    video.style.width = STYLE1;
-
-    for (let i = 0; i < 10; i++) {
-        let node = video.parentNode;
-
-        if (exlude.indexOf(node.tagName) > -1) break;
-        let s = node.getAttribute("style");
-        if (s == null) s = "";
-        if (s.indexOf("width") > -1) s = s.replace("width", "swind");
-        s = "width: " + STYLE1 + ";" + s;
-        console.log(i, node.tagName, s);
-        node.setAttribute("style", s);
-        //node.style.width = STYLE1;
-        video = video.parentNode;
+        let href = elm.href;
+        if (!isset(href)) continue;
+        if (href.indexOf("/out/") === -1) continue;
+        elm.onclick = handleClick;
     }
-
-
 }
