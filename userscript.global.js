@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         Global Functions
 // @namespace    io.appunity.global.functions
-// @version      0.13
+// @version      0.14
 // @description  Global Functions
 // @author       Fabio Lucci
 // @match        http*://*/*
+// @exclude      https://*.google.com/*
+// @exclude      https://www.google.com/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAfdJREFUOE+Fk0trFEEUhc+tdmYRySJbQYIGtxJxIogYIYvgxo1krSiJrozgXxElEGP8CyYrDdkERlSUrPMYiAp5YUhkMl3d9bpSlemxajbeVT36fHXq3GpCX91e27shsmwGzBNZxwxba12peccxVrUxC+tTI99iCVWTyQ/754tB8YqABwBI5AZkXNg21kGpMGbHWLS1+rPv9y7kfiEAvLgcFCsAbgaFY2SnOvEmCwPmsyVmNE2tPukhATD+6eAdgR5WClIWorAJQCkLY7uEAOHFL/cvPaZw53PZ58qNVwlpQPrMflXGOKh0jRVojO40D+dBmI4/Fh0Nik7ze9YxyjJ15YjmaLx52CLC5QRwqkCpATjHKPoAzLTlAQbgLAaEAN2/+3aDgw8yLgYUjS23SgLq8UYn173Eexk4xubvtDMACg/YJODK/wDKMraP+gDMG9RY2p4TRE9jgJQmhBZXrh12jtMrgPk1XXvfatQEvsZt9GH5tsV1Ih122zHAx2wb4SE1llpvBeFRJdDaoVRpy/baBscygc5j9uqTALi+vDtALD8Kwi0/9y3LZWp360hBV0zGGuzQXby4KHs/U4BAvhQITsi3zHYfU7t0+PXHA71tXoAZeu7F/rAeoLLvM8mIpxk0UUgzXBp2P0/0D2XcKojfYHZ0Pc7mL7QpGu6oHMpoAAAAAElFTkSuQmCC
 // @connect      localhost
 // @connect      agrozootecnica.net
@@ -40,7 +42,7 @@ document.userscript_global = {
         return remote_resource
     },
     init: () => {
-        document.userscript_global.console();
+        //document.userscript_global.console();
         //document.userscript_global.remoteLog();
     },
     log: (module = 'GLOBAL FUNCTION', ...valuesArguments) => {
@@ -75,15 +77,14 @@ document.userscript_global = {
         }
 
         try {
-            let elm = document.createElement("script");
+            console.clear=()=>{};
+            /* let elm = document.createElement("script");
             elm.innerHTML = "console.clear=()=>{}";
             elm = document.documentElement.appendChild(elm);
             window.setTimeout(() => {
-                document.documentElement.removeChild(elm);
-                /* document.userscript_global.setResource("CONSOLE_LOG_JS");
-                document.userscript_global.setResource("CONSOLE_LOG_DETAILS_JS"); */
+                document.documentElement.removeChild(elm);               
                 document.userscript_global.log("INIT");
-            }, 10)
+            }, 10) */
         } catch (error) {
         }
 
@@ -339,7 +340,7 @@ function globalScript() {
 function trustedTypesInit() {
     let sec = document.querySelector("#trustedTypes");
     if (sec !== null) return;
-
+        //<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'">
     try {
         if (window.trustedTypes && window.trustedTypes.createPolicy) {
             window.trustedTypes.createPolicy('default', {
@@ -354,7 +355,8 @@ function trustedTypesInit() {
     const metaElement = document.createElement('meta');
     metaElement.id = "trustedTypes";
     metaElement.setAttribute("http-equiv", "Content-Security-Policy");
-    metaElement.setAttribute("content", "trusted-types test");
+    metaElement.setAttribute("content", "trusted-types test unsafe-inline");
+    //metaElement.setAttribute("content", "default-src 'self'; script-src 'self' 'unsafe-inline'");
 
     'use strict';
     try {
@@ -373,7 +375,7 @@ function trustedTypesInit() {
     document.toast.init();
 
     window.addEventListener('load', async function () {
-
+        document.userscript_global.console();
         document.userscript_global.getBootstrapVersion();
         document.userscript_global.log("GLOBAL FUNCTION", "BOOTSRAP VERSION", document.userscript_global.bootstrap_version);
 
