@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VideoTimeControls
 // @namespace    http://tampermonkey.net/
-// @version      0.39
+// @version      0.44
 // @description  VideoTimeControls
 // @author       bigbear2sfc
 // @match        https://spankbang.com/*
@@ -24,6 +24,7 @@
 // ==/UserScript==
 
 'use strict';
+
 
 const emoji_error = "\u{1F4A2}";
 const emoji_info = "ℹ️ℹ️";
@@ -90,7 +91,7 @@ document.get_xhamster_search = function () {
     document.userscript_global.getValue("xhamster_search", "[]", (resp) => {
         resp = JSON.parse(resp);
         modulo.data = JSON.parse(resp.data);
-        console.debug(IOK + 'get_xhamster_search', modulo.data);
+        //console.debug(IOK + 'get_xhamster_search', modulo.data);
 
         setTimeout(() => document.set_xhamster_search(), 1000);
     });
@@ -109,7 +110,7 @@ document.set_xhamster_search = function () {
         xhamster_search.push(href);
     }
     document.userscript_global.setValue("xhamster_search", xhamster_search);
-    console.debug(IOK, xhamster_search);
+    //console.debug(IOK, xhamster_search);
 
 
 };
@@ -434,15 +435,17 @@ function xnxxColorizeTime() {
 
 }
 
+ 
 function fuqColorizeTime() {
-    //debugLog("fuqColorizeTime");
-    const collection = document.querySelectorAll(".duration-300 > span");
+    debugLog("fuqColorizeTime");
+    const collection = document.querySelectorAll("span.badge.badge-solid.text-sm.rounded.float-right");
 
+    let count = 0;
 
     for (let i = 0; i < collection.length; i++) {
         try {
             let elm = collection[i];
-            elm = elm.parentNode.parentNode.querySelector(".grid-flow-col");
+            //elm = elm.parentNode.parentNode.querySelector(".grid-flow-col");
 
             let text = elm.innerText;
 
@@ -453,7 +456,7 @@ function fuqColorizeTime() {
             let time = timeToSeconds(text);
             let t_time = typeTime(text, true);
 
-            let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
+            let item = elm.parentNode.parentNode.parentNode;
             let record = {
                 "element": item,
                 "seconds": time * 60,
@@ -473,13 +476,19 @@ function fuqColorizeTime() {
         } catch (error) {
             console.log(error.message)
         }
-
+        count++;
     }
 
+    if (count > 0) {
+        document.us_fuq.fixTitles();
+        //us_highlight.execute();
+    }
 
+    debugLog("fuqColorizeTime", count);
 }
 
 function xHamsterColorizeTime() {
+
 
     let ifrm = document.querySelector("iframe");
     if (ifrm !== null) ifrm.remove();
@@ -518,7 +527,7 @@ function xHamsterColorizeTime() {
         if (!elm.classList.contains("us-video-min-global")) {
             elm.classList.add("us-video-min-global");
             elm.classList.add("us-video-min-" + t_time.toString());
-        }else{
+        } else {
             continue;
         }
 
@@ -529,7 +538,7 @@ function xHamsterColorizeTime() {
         /* elm.style.color = time_colors[t_time];
         elm.style.fontSize = "20px"; */
         item.classList.add("us-watched-min-" + t_time.toString());
-        
+
 
         try {
             elm = elm.parentElement.parentElement.parentElement;
@@ -551,6 +560,7 @@ function xHamsterColorizeTime() {
     }
 
     if (items_count > 0) {
+        //us_highlight.execute();
 
         document.us_vtc.is_change_filter = true;
         document.us_vtc.applyFilter();
@@ -559,6 +569,7 @@ function xHamsterColorizeTime() {
         container.style.zoom = 1.2
 
     }
+
 }
 
 function durationColorizeTime() {
@@ -612,7 +623,7 @@ function durationColorizeTime() {
 
         elm.style.color = time_colors[t_time];
         item.classList.add("us-watched-min-" + t_time.toString());
-        
+
         if (!elm.classList.contains("us-video-min-global")) {
             elm.classList.add("us-video-min-global");
             elm.classList.add("us-video-min-" + t_time.toString());
@@ -653,6 +664,14 @@ function universalColorizeTime() {
         let elm = collection[i];
 
         if (elm == undefined) continue;
+        item = elm;
+        for (let x = 0; x < document.us_vtc.is_groups_global_parent; x++) item = item.parentNode;
+
+        let tmp = item.innerText;
+        if (tmp.indexOf("No video available") > -1) {
+            item.remove();
+            continue;
+        }
 
         let time_text = collection[i].innerText.toLowerCase();
 
@@ -688,8 +707,7 @@ function universalColorizeTime() {
             continue;
         }
 
-        item = elm;
-        for (let x = 0; x < document.us_vtc.is_groups_global_parent; x++) item = item.parentNode;
+
         //let item = elm.parentNode.parentNode.parentNode.parentNode.parentNode;
         let record = {
             "element": item,
@@ -707,6 +725,11 @@ function universalColorizeTime() {
         elm.style.borderRadius = '6px'; */
 
     }
+
+    if (count > 0) {
+        //document.us_fuq.fixTitles();
+        //us_highlight.execute();
+    }
     //console.debug(IWARNING, element_video);
     //debugLog(IWARNING + "universalColorizeTime Count", count);
 
@@ -720,6 +743,81 @@ function startColorizeTime(l) {
         colorizeTime();
     }, 10000);
 }
+function decodeAndExtractLink(base64String) {
+    // Decodifica della stringa base64
+    const decodedString = atob(base64String);
+
+    // Regex per trovare un link HTTP o HTTPS
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = decodedString.match(urlRegex);
+
+    // Se trova un link, lo restituisce, altrimenti restituisce un messaggio
+    return match ? match[0] : 'Nessun link trovato';
+}
+
+document.us_fuq = {
+    is_init: false,
+    fixTitles: () => {
+        let me = document.us_fuq;
+        if (me.is_init) return;
+        me.is_init = true;
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .item-title-ex {
+                text-overflow: unset! important;
+                white-space: unset! important;
+            }`;
+        document.body.appendChild(style);
+        const divElements = document.querySelectorAll('a.item-title.item-link.rate-link.font-medium');
+        divElements.forEach(div => {
+            div.classList.add('item-title-ex');
+        });
+    },
+    init: () => {
+        document.us_fuq.initFix()
+        let collection = document.querySelectorAll(".item-link");
+        for (let i = 0; i < collection.length; i++) {
+            let elm = collection[i];
+            let href = elm.href;
+            if (href.indexOf("/out/?") == -1) continue;
+            console.debug(href);
+            href = href.replace("https://www.analgalore.com/out/?l=", "");
+            href = href.split("&")[0];
+            console.debug(href.split("/"));
+            href = href.split("/")[1];
+            let decode_href = document.us_fuq.decodeAndExtractLink(href);
+            console.debug(href, decode_href);
+        }
+    },
+    filterPrintableChars: (str) => {
+        let result = '';
+        for (let char of str) {
+            const code = char.charCodeAt(0);
+            if (code < 32 || code > 126) break;
+            result += char;
+        }
+        return result;
+    },
+    fromBinary: (encoded) => {
+        // Going backwards: from bytestream, to percent-encoding, to original string.
+        return decodeURIComponent(atob(str).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    },
+    decodeAndExtractLink: (base64String) => {
+        const decodedString = atob(base64String);
+        const urlRegex = /(https?:\/\/[^\s]+)/;
+        const match = decodedString.match(urlRegex);
+        let val = match ? match[0] : '';
+        return document.us_fuq.filterPrintableChars(val);
+    }
+}
+
+const c_host = window.location.host;
+const groups_fuq = ['www.fuq.com', 'www.analgalore.com', 'www.findtubes.com'];
+const groups_global = ['pornloupe.com', 'www.analgalore.com'];
+const is_this_host = (value) => { return (window.location.host.indexOf(value) > -1) };
 
 document.us_vtc = {
     is_autoplay: false,
@@ -729,12 +827,13 @@ document.us_vtc = {
     is_redtube: (window.location.host == 'www.redtube.com'),
     is_xnxx: (window.location.host == 'www.xnxx.com'),
     is_pornhub: (window.location.host.indexOf('pornhub.com') > -1),
-    is_xhamster: (window.location.host.indexOf('xhamster.') > -1),
+    is_xhamster: is_this_host('xhamster.'),
     is_eporner: (window.location.host.indexOf('.eporner.com') > -1),
     is_spankbang: (window.location.host.indexOf('spankbang.com') > -1),
-    is_groups_fuq: ['www.fuq.com', 'www.analgalore.com', 'www.findtubes.com'],
+    is_groups_fuq: groups_fuq.includes(c_host),
     is_hentaicity: (window.location.host.indexOf('hentaicity.com') > -1),
-    is_groups_global: ['pornloupe.com', 'www.analgalore.com'],
+    is_groups_global: groups_global.includes(c_host),
+    is_groups_global_idx: groups_global.indexOf(c_host),
     is_groups_global_selector: ['.time-holder', "span.item-meta-container > span:nth-child(2)"],
     is_groups_global_parent: [5, 3],
     fnColorizeTime: null,
@@ -755,10 +854,9 @@ document.us_vtc = {
         if (document.us_vtc.is_init) return;
         document.us_vtc.is_init = true;
 
-        me.is_groups_fuq = me.is_groups_fuq.indexOf(window.location.host) > -1;
-
+        /* me.is_groups_fuq = me.is_groups_fuq.indexOf(window.location.host) > -1;
         me.is_groups_global_idx = me.is_groups_global.indexOf(window.location.host);
-        me.is_groups_global = me.is_groups_global.indexOf(window.location.host) > -1;
+        me.is_groups_global = me.is_groups_global.indexOf(window.location.host) > -1; */
 
 
         if (document.us_vtc.is_xvideos) document.us_vtc.fnColorizeTime = xvideosColorizeTime;
@@ -776,6 +874,7 @@ document.us_vtc = {
             me.is_groups_global_selector = me.is_groups_global_selector[me.is_groups_global_idx];
             me.is_groups_global_parent = me.is_groups_global_parent[me.is_groups_global_idx];
             document.us_vtc.fnColorizeTime = universalColorizeTime;
+            document.us_fuq.fixTitles();
         }
 
 
@@ -801,7 +900,7 @@ document.us_vtc = {
         if (!embed) {
             document.us_vtc.addMenu();
             document.us_vtc.loadFilter();
-        } 
+        }
 
         if (document.us_vtc.is_xhamster) {
             document.get_xhamster_search();
@@ -825,10 +924,12 @@ document.us_vtc = {
         }, 2000)
         //}
 
-
-        setInterval(function () {
-            document.us_vtc.fnColorizeTime();
-        }, 10000);
+        if (!document.us_vtc.is_groups_fuq) {
+            document.us_fuq.fixTitles();
+            setInterval(function () {
+                document.us_vtc.fnColorizeTime();
+            }, 10000);
+        }
 
 
         if (me.video_container !== null) {
@@ -1370,9 +1471,10 @@ document.us_vtc = {
         let video_player = document.querySelector("#xplayer__video")
         let w = video_player.clientWidth;
 
-        if (w < 1000) {
+        if (w < 1200) {
             let button = document.querySelector(".large-mode")
-            button.click()
+            button.click();
+            $("#player-container").css("height", "780px");
         }
 
         let element = document.getElementsByTagName("main");
@@ -1417,12 +1519,66 @@ document.us_vtc = {
 }
 
 
+const us_highlight = {
+    is_groups_fuq: groups_fuq.includes(c_host),
+    highlight: (word, selector, bg_color = 'yellow', text_color = 'black') => {
+
+        if (!word || !selector) return;
+
+        const prefix_word = 'h-' + word.toLowerCase().replace(" ", "-").trim();
+        console.debug("🔷 highlight", word, selector, bg_color, text_color, prefix_word);
+
+        // Funzione per evidenziare testo
+        const evidenziaTesto = (nodo) => {
+            if (nodo.nodeType === 3) { // Nodo di testo
+                if (!nodo.nodeValue.includes(prefix_word)) {
+                    const regex = new RegExp(`(${word})`, 'gi');
+                    const htmlEvidenziato = nodo.nodeValue.replace(regex, `<span data-id='${prefix_word}' style="background-color: ${bg_color}; color: ${text_color}">$1</span>`);
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = htmlEvidenziato;
+                    nodo.replaceWith(wrapper);
+                }
+            } else if (nodo.nodeType === 1 && nodo.tagName !== 'SCRIPT' && nodo.tagName !== 'STYLE') {
+                nodo.childNodes.forEach(evidenziaTesto);
+            }
+        };
+
+        // Cerca tutti gli elementi con la classe specificata
+        const elementi = document.querySelectorAll(`${selector}`);
+        elementi.forEach((elemento) => elemento.childNodes.forEach(evidenziaTesto));
+    },
+    remove_highlight: (word, selector, bg_color = 'yellow', text_color = 'black') => {
+
+    },
+    execute: () => {
+        const words = ['ass', 'anal', 'creampie'];
+
+        if (c_host == 'xhamster.com') {
+            words.forEach((value) => us_highlight.highlight(value, '.video-thumb-info__name', '#fff100', '#0d0e12'));
+            return;
+        }
+        if (us_highlight.is_groups_fuq) {
+            words.forEach((value) => us_highlight.highlight(value, '.item-title', '#fff100', '#0d0e12'));
+            return;
+        }
+        if (c_host == 'www.analgalore.com') {
+            words.forEach((value) => us_highlight.highlight(value, '.item-title', '#fff100', '#0d0e12'));
+            return;
+        }
+    }
+}
+document.us_highlight = us_highlight;
+
 
 const menu_command_id_2 = GM_registerMenuCommand("Initialize", function (event) {
     element_video = [];
     document.us_vtc.is_init = false;
     document.us_vtc.init();
 }, "q");
+
+const menu_highlight = GM_registerMenuCommand("Highlight", function (event) {
+    us_highlight.execute();
+}, "w");
 
 (async function () {
 
@@ -1487,3 +1643,4 @@ function preventClickTagA() {
         elm.onclick = handleClick;
     }
 }
+
